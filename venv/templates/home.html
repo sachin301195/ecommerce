@@ -1,0 +1,24 @@
+{% extends "base.html" %} 
+
+{% block content %}
+
+    <!-- Product List -->
+    <div class="product-container">
+        {% for product in products %}
+            <div class="product-card">
+                <img src="https://via.placeholder.com/300x200" alt="{{ product.name }}">
+                <div class="product-info">
+                    <h2>{{ product.name }}</h2>
+                    <p>{{ product.description }}</p>
+                    <p class="price">${{ product.price }}</p>
+                    <a href="{{ url_for('add_to_cart', product_id=product.id) }}" class="add-to-cart">Add to Cart</a>
+                </div>
+            </div>
+        {% else %}
+            <br> </br>
+            <div align="center">
+            <b>No products available.</b>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

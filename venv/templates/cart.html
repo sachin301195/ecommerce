@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Your Cart</h2>
+
+    {% if cart %}
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>${{ item.price }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="text-right font-weight-bold">Total: ${{ total }}</p>
+        <div class="text-center">
+            <form method="post" action="{{ url_for('checkout') }}">
+                <button type="submit" class="btn btn-success btn-lg">Proceed to Checkout</button>
+            </form>
+        </div>
+    {% else %}
+        <p class="text-center">Your cart is empty.</p>
+    {% endif %}
+</div>
+{% endblock %}

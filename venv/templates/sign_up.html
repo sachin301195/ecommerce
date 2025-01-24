@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; margin-bottom: 50px;">
+    <h3 class="text-center my-4"><b>Thanks for Signing Up!</b></h3>
+    <form method="POST">
+        <div class="row">
+            <!-- Left Column: First Name, Last Name, Email, Password, Confirm Password, Address -->
+            <div class="col-md-6 d-flex flex-column">
+                <div class="form-group">
+                    <label for="FirstName">First Name</label>
+                    <input type="text" class="form-control" id="FirstName" name="FirstName" placeholder="First Name" required />
+                </div>
+                <div class="form-group">
+                    <label for="LastName">Last Name</label>
+                    <input type="text" class="form-control" id="LastName" name="LastName" placeholder="Last Name" required />
+                </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required />
+                </div>
+                <div class="form-group">
+                    <label for="password1">Password</label>
+                    <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter password" required />
+                </div>
+                <div class="form-group">
+                    <label for="password2">Confirm Password</label>
+                    <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm password" required />
+                </div>
+                <!-- Move Address to the first column as the last field -->
+                <div class="form-group">
+                    <label for="Address">Address</label>
+                    <input type="text" class="form-control" id="Address" name="Address" placeholder="Enter Address" required />
+                </div>
+            </div>
+
+            <!-- Right Column: Phone Number, Postal Code, City, Province, Country, Submit Button -->
+            <div class="col-md-6 d-flex flex-column justify-content-between">
+                <div class="form-group">
+                    <label for="PhoneNumber">Phone Number</label>
+                    <input type="tel" class="form-control" id="PhoneNumber" name="PhoneNumber" placeholder="Enter Phone Number" />
+                </div>
+                <div class="form-group">
+                    <label for="PostalCode">Postal Code</label>
+                    <input type="text" class="form-control" id="PostalCode" name="PostalCode" placeholder="Enter Postal Code" />
+                </div>
+                <div class="form-group">
+                    <label for="City">City</label>
+                    <input type="text" class="form-control" id="City" name="City" placeholder="Enter City name" />
+                </div>
+                <div class="form-group">
+                    <label for="Province">Province</label>
+                    <input type="text" class="form-control" id="Province" name="Province" placeholder="Enter Province" />
+                </div>
+                <div class="form-group">
+                    <label for="Country">Country</label>
+                    <input type="text" class="form-control" id="Country" name="Country" placeholder="Enter Country" />
+                </div>
+                
+                <!-- Submit button as the last element in the second column -->
+                <button type="submit" class="btn btn-primary btn-block btn-lg mt-3">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Add custom CSS to make labels bold -->
+<style>
+    label {
+        font-weight: bold;
+    }
+</style>
+
+{% endblock %}

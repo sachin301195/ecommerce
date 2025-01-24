@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Edit Product</h1>
+
+    <!-- Flash messages for errors or success -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert alert-{{ messages[0][0] }}">
+                {{ messages[0][1] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Form for editing the product -->
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name"><strong>Product Name</strong></label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ product.name }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="unit_price"><strong>Unit Price</strong></label>
+            <input type="number" class="form-control" id="unit_price" name="unit_price" value="{{ product.unit_price }}" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label for="qte_max"><strong>Max Quantity</strong></label>
+            <input type="number" class="form-control" id="qte_max" name="qte_max" value="{{ product.qte_max }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="qte_refill"><strong>Refill Quantity</strong></label>
+            <input type="number" class="form-control" id="qte_refill" name="qte_refill" value="{{ product.qte_refill }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="qte_alert"><strong>Alert Quantity</strong></label>
+            <input type="number" class="form-control" id="qte_alert" name="qte_alert" value="{{ product.qte_alert }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="reference"><strong>Product Reference</strong></label>
+            <input type="text" class="form-control" id="reference" name="reference" value="{{ product.reference }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="image"><strong>Product Image</strong></label>
+            <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
+            {% if product.image %}
+            <p class="mt-2">Current Image:</p>
+            <img src="data:image/jpeg;base64,{{ product.image | b64encode }}" alt="{{ product.name }}" class="img-fluid" style="max-height: 150px;">
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Product</button>
+        <a href="{{ url_for('cpanel.cpanel_admin') }}#products" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

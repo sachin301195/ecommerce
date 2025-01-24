@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Add New Product</h1>
+
+    <!-- Flash messages for success, error, etc. -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Form for adding a product -->
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="name"><strong>Product Name</strong></label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="unit_price"><strong>Unit Price</strong></label>
+            <input type="number" class="form-control" id="unit_price" name="unit_price" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label for="qte_max"><strong>Max Quantity</strong></label>
+            <input type="number" class="form-control" id="qte_max" name="qte_max" required>
+        </div>
+
+        <div class="form-group">
+            <label for="qte_refill"><strong>Refill Quantity</strong></label>
+            <input type="number" class="form-control" id="qte_refill" name="qte_refill" required>
+        </div>
+
+        <div class="form-group">
+            <label for="qte_alert"><strong>Alert Quantity</strong></label>
+            <input type="number" class="form-control" id="qte_alert" name="qte_alert" required>
+        </div>
+
+        <div class="form-group">
+            <label for="reference"><strong>Product Reference</strong></label>
+            <input type="text" class="form-control" id="reference" name="reference" required>
+        </div>
+
+        <div class="form-group">
+            <label for="categories"><strong>Categories</strong></label>
+            <input type="text" class="form-control" id="categories" name="categories" placeholder="e.g., Smartphone, Android, iPhone">
+        </div>
+
+        <div class="form-group">
+            <label for="description"><strong>Description</strong></label>
+            <textarea class="form-control" id="description" name="description" rows="3" placeholder="Detailed product description"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="image"><strong>Product Image</strong></label>
+            <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
+        </div>        
+
+        <button type="submit" class="btn btn-primary">Add Product</button>
+        <a href="{{ url_for('cpanel.cpanel_admin') }}#products" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

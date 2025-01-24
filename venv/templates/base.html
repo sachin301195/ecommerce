@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Welcome to Cell Phone E-Commerce Store </title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding-bottom: 50px;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .navbar {
+            background-color: black;
+            padding: 10px 20px;
+        }
+
+        .navbar-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .navbar-nav {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .navbar-nav .nav-item {
+            margin-left: 20px;
+        }
+
+        .navbar-brand {
+            color: #f1c40f !important;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            flex-grow: 1;
+            text-transform: uppercase;
+        }
+
+        .navbar-dark .navbar-nav .nav-link {
+            color: white;
+        }
+
+        .navbar-dark .navbar-nav .nav-link:hover {
+            color: #ff9800;
+        }
+
+        #home {
+            color: white;
+            font-weight: 500;
+        }
+
+        #home:hover {
+            color: #ff9800;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            margin-top: auto;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="navbar-custom">
+            <a class="nav-item nav-link" id="home" href="/">Home</a>
+            <a class="nav-item nav-link" id="home" href="/cart">Cart</a>
+            <a class="navbar-brand" href="/">Welcome to Cell Phone E-Commerce Store</a>
+            <div class="navbar-nav">
+                {% if user.is_authenticated %}
+                    {% if session.get('admin_authenticated') %}
+                        <a class="nav-item nav-link" id="admin_logout" href="{{ url_for('cpanel.admin_logout') }}">Admin Logout</a>
+                    {% else %}
+                        <a class="nav-item nav-link" id="profile" href="/profile">Profile</a>
+                        <a class="nav-item nav-link" id="logout" href="/logout">Logout</a>
+                    {% endif %}
+                {% else %}
+                    <a class="nav-item nav-link" id="login" href="/login">Login</a>
+                    <a class="nav-item nav-link" id="signUp" href="/sign-up">Sign Up</a>
+                {% endif %}
+            </div>
+            
+        </div>
+    </nav>
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Cell Phone E-Commerce Store. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const hash = window.location.hash; // Get the hash fragment from the URL
+            if (hash) {
+                const tabLink = document.querySelector(`.nav-link[href="${hash}"]`);
+                if (tabLink) {
+                    tabLink.click(); // Activate the corresponding tab
+                }
+            }
+        });
+    </script>
+</body>
+</html>
