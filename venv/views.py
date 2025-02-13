@@ -3,6 +3,7 @@ from flask_login import login_required, current_user
 from .models import User, Product
 from . import db
 import base64, stripe
+from flask_mail import Message
 
 views = Blueprint('views', __name__)
 
