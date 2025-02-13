@@ -54,27 +54,3 @@ class CompanyInfo(db.Model):
     address = db.Column(db.String(255), nullable=False)
     website = db.Column(db.String(255), nullable=True)
     
-class Billing(db.Model):
-    __tablename__ = 'billing'
-    Billing_ID = db.Column(db.Integer, primary_key=True)
-    Date = db.Column(db.Date, default=datetime.now(timezone.utc))
-    Quantity = db.Column(db.Integer, nullable=False)
-    Total_BT = db.Column(db.Float, nullable=False)  # Before Tax
-    Total_HST = db.Column(db.Float, nullable=False)
-    Total_Net = db.Column(db.Float, nullable=False)  # Net Total
-    Client_ID = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    Observations = db.Column(db.String(255))
-    HST_ID = db.Column(db.Integer, db.ForeignKey('hst.id'))
-    details = db.relationship('BillDetails', backref='billing', lazy=True)
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
-
-
-class BillDetails(db.Model):
-    __tablename__ = 'bill_details'
-    Bill_Details_ID = db.Column(db.Integer, primary_key=True)
-    Billing_ID = db.Column(db.Integer, db.ForeignKey('billing.Billing_ID'), nullable=False)
-    Price = db.Column(db.Float, nullable=False)
-    Product_ID = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))

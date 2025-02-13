@@ -52,12 +52,6 @@ def create_app():
 
 
 from .models import AuthenticationAdmin
-'''
-def create_database(app):
-    if not path.exists('website/' + DB_NAME):
-        db.create_all(app=app)
-        print('Created Database!')
-'''
         
 def create_database(app):
     if not path.exists(DB_NAME):  # Use the correct path for `DB_NAME`

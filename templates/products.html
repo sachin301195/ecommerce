@@ -1,0 +1,8 @@
+{% extends "home.html" %}
+
+{% block content %}
+<h2>{{ product.name }}</h2>
+<p>{{ product.description }}</p>
+<p>Price: ${{ product.price }}</p>
+<a href="{{ url_for('add_to_cart', product_id=product.id) }}">Add to Cart</a>
+{% endblock %}

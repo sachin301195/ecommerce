@@ -7,9 +7,14 @@
     <!-- Flash messages for errors or success -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            <div class="alert alert-{{ messages[0][0] }}">
-                {{ messages[0][1] }}
-            </div>
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissable fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
         {% endif %}
     {% endwith %}
 
