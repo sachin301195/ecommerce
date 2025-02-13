@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center">
+        <h1 class="mb-4 display-4 fw-bold">About Us</h1>
+        <p class="lead text-muted">
+            Discover who we are, what we stand for, and how we strive to serve you better every day.
+        </p>
+    </div>
+
+    <!-- Mission and Vision Section -->
+    <div class="row my-5">
+        <div class="col-md-6">
+            <h2 class="fw-bold">Our Mission</h2>
+            <p class="text-muted">
+                At <strong>Cell Phone E-Commerce Store</strong>, we aim to provide the latest and greatest in mobile technology. 
+                Our goal is to offer top-quality products at affordable prices while delivering a seamless online shopping experience.
+            </p>
+        </div>
+        <div class="col-md-6">
+            <h2 class="fw-bold">Our Vision</h2>
+            <p class="text-muted">
+                We envision becoming the go-to destination for mobile devices and accessories, known for our innovation, reliability, and exceptional customer care.
+            </p>
+        </div>
+    </div>
+
+    <!-- Core Values Section -->
+    <div class="my-5 py-4 bg-light rounded shadow">
+        <h2 class="text-center fw-bold">Our Core Values</h2>
+        <div class="row mt-4">
+            <div class="col-md-4 text-center">
+                <i class="fas fa-handshake fa-3x text-primary mb-3"></i>
+                <h4>Integrity</h4>
+                <p class="text-muted">We value honesty and transparency in everything we do.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-lightbulb fa-3x text-warning mb-3"></i>
+                <h4>Innovation</h4>
+                <p class="text-muted">We continuously seek to embrace and leverage the latest technologies.</p>
+            </div>
+            <div class="col-md-4 text-center">
+                <i class="fas fa-user-check fa-3x text-success mb-3"></i>
+                <h4>Customer First</h4>
+                <p class="text-muted">Your satisfaction is our top priority, and we’re here to support you every step of the way.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <div class="text-center my-5">
+        <h2 class="fw-bold">Get in Touch</h2>
+        <p class="text-muted">
+            Have questions or need assistance? Visit our <a href="{{ url_for('views.contact') }}" class="text-decoration-underline">Contact Page</a> and let us help you.
+        </p>
+        <a href="{{ url_for('views.contact') }}" class="btn btn-primary btn-lg mt-3">Contact Us</a>
+    </div>
+</div>
+{% endblock %}

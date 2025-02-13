@@ -1,0 +1,1435 @@
+[1mdiff --git a/MyApp.py b/MyApp.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1fcd460[m
+[1m--- /dev/null[m
+[1m+++ b/MyApp.py[m
+[36m@@ -0,0 +1,59 @@[m
+[32m+[m[32mfrom venv import create_app[m
+[32m+[m
+[32m+[m[32mapp = create_app()[m
+[32m+[m
+[32m+[m[32mif __name__ == '__main__':[m
+[32m+[m[32m    app.run(debug=True)[m
+[32m+[m
+[32m+[m[32m'''[m
+[32m+[m[32m# Load products from a JSON file"[m
+[32m+[m[32mdef load_products():[m
+[32m+[m[32m       with open("products.json") as f:[m
+[32m+[m[32m         return json.load(f)[m
+[32m+[m[41m           [m
+[32m+[m[32m# Routes[m
+[32m+[m[32m@app.route("/")[m
+[32m+[m[32mdef home():[m
+[32m+[m[32m    products = load_products()[m
+[32m+[m[32m    #print(products)[m
+[32m+[m[32m    return render_template("home.html", products=products)[m
+[32m+[m
+[32m+[m[32m@app.route("/toto")[m
+[32m+[m[32mdef base():[m
+[32m+[m[41m    [m
+[32m+[m[32m    return render_template("home.html")[m
+[32m+[m
+[32m+[m
+[32m+[m[32m@app.route("/product/<int:product_id>")[m
+[32m+[m[32mdef product(product_id):[m
+[32m+[m[32m    products = load_products()[m
+[32m+[m[32m    product = next((p for p in products if p["id"] == product_id), None)[m
+[32m+[m[32m    if product is None:[m
+[32m+[m[32m        return "Product not found", 404[m
+[32m+[m[32m    return render_template("product.html", product=product)[m
+[32m+[m
+[32m+[m[32m@app.route("/add-to-cart/<int:product_id>")[m
+[32m+[m[32mdef add_to_cart(product_id):[m
+[32m+[m[32m    products = load_products()[m
+[32m+[m[32m    product = next((p for p in products if p["id"] == product_id), None)[m
+[32m+[m[32m    if product is None:[m
+[32m+[m[32m        return "Product not found", 404[m
+[32m+[m
+[32m+[m[32m    # Add product to cart in session[m
+[32m+[m[32m    if "cart" not in session:[m
+[32m+[m[32m        session["cart"] = [][m
+[32m+[m[32m    session["cart"].append(product)[m
+[32m+[m[32m    return redirect(url_for("cart"))[m
+[32m+[m
+[32m+[m[32m@app.route("/cart")[m
+[32m+[m[32mdef cart():[m
+[32m+[m[32m    cart = session.get("cart", [])[m
+[32m+[m[32m    total = sum(item["price"] for item in cart)[m
+[32m+[m[32m    return render_template("cart.html", cart=cart, total=total)[m
+[32m+[m
+[32m+[m[32m@app.route("/checkout", methods=["POST"])[m
+[32m+[m[32mdef checkout():[m
+[32m+[m[32m    session.pop("cart", None)  # Clear the cart[m
+[32m+[m[32m    return "Thank you for your purchase!"[m
+[32m+[m[32m    '''[m
+[32m+[m
+[1mdiff --git a/__pycache__/MyApp.cpython-312.pyc b/__pycache__/MyApp.cpython-312.pyc[m
+[1mnew file mode 100644[m
+[1mindex 0000000..327f984[m
+Binary files /dev/null and b/__pycache__/MyApp.cpython-312.pyc differ
+[1mdiff --git a/instance/database.db b/instance/database.db[m
+[1mnew file mode 100644[m
+[1mindex 0000000..7c821c7[m
+Binary files /dev/null and b/instance/database.db differ
+[1mdiff --git a/migrations/README b/migrations/README[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0e04844[m
+[1m--- /dev/null[m
+[1m+++ b/migrations/README[m
+[36m@@ -0,0 +1 @@[m
+[32m+[m[32mSingle-database configuration for Flask.[m
+[1mdiff --git a/migrations/__pycache__/env.cpython-312.pyc b/migrations/__pycache__/env.cpython-312.pyc[m
+[1mnew file mode 100644[m
+[1mindex 0000000..3ff627e[m
+Binary files /dev/null and b/migrations/__pycache__/env.cpython-312.pyc differ
+[1mdiff --git a/migrations/alembic.ini b/migrations/alembic.ini[m
+[1mnew file mode 100644[m
+[1mindex 0000000..ec9d45c[m
+[1m--- /dev/null[m
+[1m+++ b/migrations/alembic.ini[m
+[36m@@ -0,0 +1,50 @@[m
+[32m+[m[32m# A generic, single database configuration.[m
+[32m+[m
+[32m+[m[32m[alembic][m
+[32m+[m[32m# template used to generate migration files[m
+[32m+[m[32m# file_template = %%(rev)s_%%(slug)s[m
+[32m+[m
+[32m+[m[32m# set to 'true' to run the environment during[m
+[32m+[m[32m# the 'revision' command, regardless of autogenerate[m
+[32m+[m[32m# revision_environment = false[m
+[32m+[m
+[32m+[m
+[32m+[m[32m# Logging configuration[m
+[32m+[m[32m[loggers][m
+[32m+[m[32mkeys = root,sqlalchemy,alembic,flask_migrate[m
+[32m+[m
+[32m+[m[32m[handlers][m
+[32m+[m[32mkeys = console[m
+[32m+[m
+[32m+[m[32m[formatters][m
+[32m+[m[32mkeys = generic[m
+[32m+[m
+[32m+[m[32m[logger_root][m
+[32m+[m[32mlevel = WARN[m
+[32m+[m[32mhandlers = console[m
+[32m+[m[32mqualname =[m
+[32m+[m
+[32m+[m[32m[logger_sqlalchemy][m
+[32m+[m[32mlevel = WARN[m
+[32m+[m[32mhandlers =[m
+[32m+[m[32mqualname = sqlalchemy.engine[m
+[32m+[m
+[32m+[m[32m[logger_alembic][m
+[32m+[m[32mlevel = INFO[m
+[32m+[m[32mhandlers =[m
+[32m+[m[32mqualname = alembic[m
+[32m+[m
+[32m+[m[32m[logger_flask_migrate][m
+[32m+[m[32mlevel = INFO[m
+[32m+[m[32mhandlers =[m
+[32m+[m[32mqualname = flask_migrate[m
+[32m+[m
+[32m+[m[32m[handler_console][m
+[32m+[m[32mclass = StreamHandler[m
+[32m+[m[32margs = (sys.stderr,)[m
+[32m+[m[32mlevel = NOTSET[m
+[32m+[m[32mformatter = generic[m
+[32m+[m
+[32m+[m[32m[formatter_generic][m
+[32m+[m[32mformat = %(levelname)-5.5s [%(name)s] %(message)s[m
+[32m+[m[32mdatefmt = %H:%M:%S[m
+[1mdiff --git a/migrations/env.py b/migrations/env.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..4c97092[m
+[1m--- /dev/null[m
+[1m+++ b/migrations/env.py[m
+[36m@@ -0,0 +1,113 @@[m
+[32m+[m[32mimport logging[m
+[32m+[m[32mfrom logging.config import fileConfig[m
+[32m+[m
+[32m+[m[32mfrom flask import current_app[m
+[32m+[m
+[32m+[m[32mfrom alembic import context[m
+[32m+[m
+[32m+[m[32m# this is the Alembic Config object, which provides[m
+[32m+[m[32m# access to the values within the .ini file in use.[m
+[32m+[m[32mconfig = context.config[m
+[32m+[m
+[32m+[m[32m# Interpret the config file for Python logging.[m
+[32m+[m[32m# This line sets up loggers basically.[m
+[32m+[m[32mfileConfig(config.config_file_name)[m
+[32m+[m[32mlogger = logging.getLogger('alembic.env')[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef get_engine():[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        # this works with Flask-SQLAlchemy<3 and Alchemical[m
+[32m+[m[32m        return current_app.extensions['migrate'].db.get_engine()[m
+[32m+[m[32m    except (TypeError, AttributeError):[m
+[32m+[m[32m        # this works with Flask-SQLAlchemy>=3[m
+[32m+[m[32m        return current_app.extensions['migrate'].db.engine[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef get_engine_url():[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        return get_engine().url.render_as_string(hide_password=False).replace([m
+[32m+[m[32m            '%', '%%')[m
+[32m+[m[32m    except AttributeError:[m
+[32m+[m[32m        return str(get_engine().url).replace('%', '%%')[m
+[32m+[m
+[32m+[m
+[32m+[m[32m# add your model's MetaData object here[m
+[32m+[m[32m# for 'autogenerate' support[m
+[32m+[m[32m# from myapp import mymodel[m
+[32m+[m[32m# target_metadata = mymodel.Base.metadata[m
+[32m+[m[32mconfig.set_main_option('sqlalchemy.url', get_engine_url())[m
+[32m+[m[32mtarget_db = current_app.extensions['migrate'].db[m
+[32m+[m
+[32m+[m[32m# other values from the config, defined by the needs of env.py,[m
+[32m+[m[32m# can be acquired:[m
+[32m+[m[32m# my_important_option = config.get_main_option("my_important_option")[m
+[32m+[m[32m# ... etc.[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef get_metadata():[m
+[32m+[m[32m    if hasattr(target_db, 'metadatas'):[m
+[32m+[m[32m        return target_db.metadatas[None][m
+[32m+[m[32m    return target_db.metadata[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef run_migrations_offline():[m
+[32m+[m[32m    """Run migrations in 'offline' mode.[m
+[32m+[m
+[32m+[m[32m    This configures the context with just a URL[m
+[32m+[m[32m    and not an Engine, though an Engine is acceptable[m
+[32m+[m[32m    here as well.  By skipping the Engine creation[m
+[32m+[m[32m    we don't even need a DBAPI to be available.[m
+[32m+[m
+[32m+[m[32m    Calls to context.execute() here emit the given string to the[m
+[32m+[m[32m    script output.[m
+[32m+[m
+[32m+[m[32m    """[m
+[32m+[m[32m    url = config.get_main_option("sqlalchemy.url")[m
+[32m+[m[32m    context.configure([m
+[32m+[m[32m        url=url, target_metadata=get_metadata(), literal_binds=True[m
+[32m+[m[32m    )[m
+[32m+[m
+[32m+[m[32m    with context.begin_transaction():[m
+[32m+[m[32m        context.run_migrations()[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef run_migrations_online():[m
+[32m+[m[32m    """Run migrations in 'online' mode.[m
+[32m+[m
+[32m+[m[32m    In this scenario we need to create an Engine[m
+[32m+[m[32m    and associate a connection with the context.[m
+[32m+[m
+[32m+[m[32m    """[m
+[32m+[m
+[32m+[m[32m    # this callback is used to prevent an auto-migration from being generated[m
+[32m+[m[32m    # when there are no changes to the schema[m
+[32m+[m[32m    # reference: http://alembic.zzzcomputing.com/en/latest/cookbook.html[m
+[32m+[m[32m    def process_revision_directives(context, revision, directives):[m
+[32m+[m[32m        if getattr(config.cmd_opts, 'autogenerate', False):[m
+[32m+[m[32m            script = directives[0][m
+[32m+[m[32m            if script.upgrade_ops.is_empty():[m
+[32m+[m[32m                directives[:] = [][m
+[32m+[m[32m                logger.info('No changes in schema detected.')[m
+[32m+[m
+[32m+[m[32m    conf_args = current_app.extensions['migrate'].configure_args[m
+[32m+[m[32m    if conf_args.get("process_revision_directives") is None:[m
+[32m+[m[32m        conf_args["process_revision_directives"] = process_revision_directives[m
+[32m+[m
+[32m+[m[32m    connectable = get_engine()[m
+[32m+[m
+[32m+[m[32m    with connectable.connect() as connection:[m
+[32m+[m[32m        context.configure([m
+[32m+[m[32m            connection=connection,[m
+[32m+[m[32m            target_metadata=get_metadata(),[m
+[32m+[m[32m            **conf_args[m
+[32m+[m[32m        )[m
+[32m+[m
+[32m+[m[32m        with context.begin_transaction():[m
+[32m+[m[32m            context.run_migrations()[m
+[32m+[m
+[32m+[m
+[32m+[m[32mif context.is_offline_mode():[m
+[32m+[m[32m    run_migrations_offline()[m
+[32m+[m[32melse:[m
+[32m+[m[32m    run_migrations_online()[m
+[1mdiff --git a/migrations/script.py.mako b/migrations/script.py.mako[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2c01563[m
+[1m--- /dev/null[m
+[1m+++ b/migrations/script.py.mako[m
+[36m@@ -0,0 +1,24 @@[m
+[32m+[m[32m"""${message}[m
+[32m+[m
+[32m+[m[32mRevision ID: ${up_revision}[m
+[32m+[m[32mRevises: ${down_revision | comma,n}[m
+[32m+[m[32mCreate Date: ${create_date}[m
+[32m+[m
+[32m+[m[32m"""[m
+[32m+[m[32mfrom alembic import op[m
+[32m+[m[32mimport sqlalchemy as sa[m
+[32m+[m[32m${imports if imports else ""}[m
+[32m+[m
+[32m+[m[32m# revision identifiers, used by Alembic.[m
+[32m+[m[32mrevision = ${repr(up_revision)}[m
+[32m+[m[32mdown_revision = ${repr(down_revision)}[m
+[32m+[m[32mbranch_labels = ${repr(branch_labels)}[m
+[32m+[m[32mdepends_on = ${repr(depends_on)}[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef upgrade():[m
+[32m+[m[32m    ${upgrades if upgrades else "pass"}[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef downgrade():[m
+[32m+[m[32m    ${downgrades if downgrades else "pass"}[m
+[1mdiff --git a/products.json b/products.json[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c53c71d[m
+[1m--- /dev/null[m
+[1m+++ b/products.json[m
+[36m@@ -0,0 +1,5 @@[m
+[32m+[m[32m[[m
+[32m+[m[32m    {"id": 1, "name": "Laptop", "price": 999.99, "description": "A powerful laptop."},[m
+[32m+[m[32m    {"id": 2, "name": "Smartphone", "price": 499.99, "description": "A sleek smartphone."},[m
+[32m+[m[32m    {"id": 3, "name": "Headphones", "price": 199.99, "description": "Noise-canceling headphones."}[m
+[32m+[m[32m][m
+[1mdiff --git a/requirements.txt b/requirements.txt[m
+[1mnew file mode 100644[m
+[1mindex 0000000..30b3a3a[m
+[1m--- /dev/null[m
+[1m+++ b/requirements.txt[m
+[36m@@ -0,0 +1,15 @@[m
+[32m+[m[32malembic==1.14.1[m
+[32m+[m[32mblinker==1.9.0[m
+[32m+[m[32mclick==8.1.8[m
+[32m+[m[32mFlask==3.1.0[m
+[32m+[m[32mFlask-Login==0.6.3[m
+[32m+[m[32mFlask-Migrate==4.1.0[m
+[32m+[m[32mFlask-SQLAlchemy==3.1.1[m
+[32m+[m[32mgreenlet==3.1.1[m
+[32m+[m[32mitsdangerous==2.2.0[m
+[32m+[m[32mJinja2==3.1.5[m
+[32m+[m[32mMako==1.3.8[m
+[32m+[m[32mMarkupSafe==3.0.2[m
+[32m+[m[32mSQLAlchemy==2.0.37[m
+[32m+[m[32mtyping_extensions==4.12.2[m
+[32m+[m[32mWerkzeug==3.1.3[m
+[1mdiff --git a/static/uploads/s24.jpeg b/static/uploads/s24.jpeg[m
+[1mnew file mode 100644[m
+[1mindex 0000000..afaf508[m
+Binary files /dev/null and b/static/uploads/s24.jpeg differ
+[1mdiff --git a/templates/products.html b/templates/products.html[m
+[1mnew file mode 100644[m
+[1mindex 0000000..e69de29[m
+[1mdiff --git a/venv/__init__.py b/venv/__init__.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..6ed1aa0[m
+[1m--- /dev/null[m
+[1m+++ b/venv/__init__.py[m
+[36m@@ -0,0 +1,83 @@[m
+[32m+[m[32mfrom flask import Flask, render_template, request, redirect, url_for, session[m
+[32m+[m[32mfrom flask_sqlalchemy import SQLAlchemy[m
+[32m+[m[32mfrom flask_migrate import Migrate[m
+[32m+[m[32mimport json[m
+[32m+[m[32mimport os[m
+[32m+[m[32mfrom werkzeug.security import generate_password_hash, check_password_hash[m
+[32m+[m[32mfrom os import path[m
+[32m+[m[32mfrom flask_login import LoginManager[m
+[32m+[m[32mimport base64[m
+[32m+[m
+[32m+[m[32mdb = SQLAlchemy()[m
+[32m+[m[32mDB_NAME = "database.db"[m
+[32m+[m[41m    [m
+[32m+[m[32mdef create_app():[m
+[32m+[m[32m    app = Flask(__name__)[m
+[32m+[m[32m    app.jinja_env.filters['b64encode'] = b64encode[m
+[32m+[m[32m    app.config['SECRET_KEY'] = 'hjshjhdjah kjshkjdhjs' # Used for session management[m
+[32m+[m[32m    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'[m
+[32m+[m[32m    db.init_app(app)[m
+[32m+[m[32m    app.config['UPLOAD_FOLDER'] = os.path.join(os.getcwd(), 'static', 'uploads')[m
+[32m+[m[32m    migrate = Migrate(app, db)[m
+[32m+[m[41m    [m
+[32m+[m
+[32m+[m[32m    from .views import views[m
+[32m+[m[32m    from .auth import auth[m
+[32m+[m[32m    from .cpanel import cpanel[m
+[32m+[m
+[32m+[m[32m    app.register_blueprint(views, url_prefix='/')[m
+[32m+[m[32m    app.register_blueprint(auth, url_prefix='/')[m
+[32m+[m[32m    app.register_blueprint(cpanel, url_prefix='/')[m
+[32m+[m[41m    [m
+[32m+[m[32m    from .models import User[m
+[32m+[m[41m    [m
+[32m+[m[32m    with app.app_context():[m
+[32m+[m[32m        db.create_all()[m
+[32m+[m
+[32m+[m[32m    login_manager = LoginManager()[m
+[32m+[m[32m    login_manager.login_view = 'auth.login'[m
+[32m+[m[32m    login_manager.init_app(app)[m
+[32m+[m
+[32m+[m[32m    @login_manager.user_loader[m
+[32m+[m[32m    def load_user(id):[m
+[32m+[m[32m        return User.query.get(int(id))[m
+[32m+[m[41m    [m
+[32m+[m[32m    @app.context_processor[m
+[32m+[m[32m    def inject_user():[m
+[32m+[m[32m        return {'user': {'is_authenticated': session.get('admin_authenticated', False)}}[m[41m    [m
+[32m+[m[41m    [m
+[32m+[m[32m    return app[m
+[32m+[m
+[32m+[m
+[32m+[m[32mfrom .models import AuthenticationAdmin[m
+[32m+[m[32m'''[m
+[32m+[m[32mdef create_database(app):[m
+[32m+[m[32m    if not path.exists('website/' + DB_NAME):[m
+[32m+[m[32m        db.create_all(app=app)[m
+[32m+[m[32m        print('Created Database!')[m
+[32m+[m[32m'''[m
+[32m+[m[41m        [m
+[32m+[m[32mdef create_database(app):[m
+[32m+[m[32m    if not path.exists(DB_NAME):  # Use the correct path for `DB_NAME`[m
+[32m+[m[32m        db.create_all(app=app)[m
+[32m+[m[32m        print('Created Database!')[m
+[32m+[m[41m        [m
+[32m+[m[32mdef create_admin_user(app):[m
+[32m+[m[32m    with app.app_context():[m
+[32m+[m[32m        if not AuthenticationAdmin.query.filter_by(login="admin").first():[m
+[32m+[m[32m            new_admin = AuthenticationAdmin([m
+[32m+[m[32m                login="admin",[m
+[32m+[m[32m                password=generate_password_hash("adminpassword", method="pbkdf2:sha256")[m
+[32m+[m[32m            )[m
+[32m+[m[32m            db.session.add(new_admin)[m
+[32m+[m[32m            db.session.commit()[m
+[32m+[m[32m            print("Admin user created successfully!")[m
+[32m+[m[32m        else:[m
+[32m+[m[32m            print("Admin user already exists!")[m
+[32m+[m
+[32m+[m[32mdef b64encode(value):[m
+[32m+[m[32m    if value is not None:[m
+[32m+[m[32m        return base64.b64encode(value).decode('utf-8')[m
+[32m+[m[32m    return None[m
+[32m+[m[41m   [m
+[32m+[m
+[1mdiff --git a/venv/__pycache__/__init__.cpython-312.pyc b/venv/__pycache__/__init__.cpython-312.pyc[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0b9808f[m
+Binary files /dev/null and b/venv/__pycache__/__init__.cpython-312.pyc differ
+[1mdiff --git a/venv/__pycache__/auth.cpython-312.pyc b/venv/__pycache__/auth.cpython-312.pyc[m
+[1mnew file mode 100644[m
+[1mindex 0000000..512b563[m
+Binary files /dev/null and b/venv/__pycache__/auth.cpython-312.pyc differ
+[1mdiff --git a/venv/__pycache__/cpanel.cpython-312.pyc b/venv/__pycache__/cpanel.cpython-312.pyc[m
+[1mnew file mode 100644[m
+[1mindex 0000000..59b5a25[m
+Binary files /dev/null and b/venv/__pycache__/cpanel.cpython-312.pyc differ
+[1mdiff --git a/venv/__pycache__/models.cpython-312.pyc b/venv/__pycache__/models.cpython-312.pyc[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1847996[m
+Binary files /dev/null and b/venv/__pycache__/models.cpython-312.pyc differ
+[1mdiff --git a/venv/__pycache__/views.cpython-312.pyc b/venv/__pycache__/views.cpython-312.pyc[m
+[1mnew file mode 100644[m
+[1mindex 0000000..896eaa6[m
+Binary files /dev/null and b/venv/__pycache__/views.cpython-312.pyc differ
+[1mdiff --git a/venv/auth.py b/venv/auth.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..07d613b[m
+[1m--- /dev/null[m
+[1m+++ b/venv/auth.py[m
+[36m@@ -0,0 +1,123 @@[m
+[32m+[m[32mfrom flask import Blueprint, render_template, request, flash, redirect, url_for[m
+[32m+[m[32mfrom .models import User[m
+[32m+[m[32mfrom werkzeug.security import generate_password_hash, check_password_hash[m
+[32m+[m[32mfrom . import db   ##means from __init__.py import db[m
+[32m+[m[32mfrom flask_login import login_user, login_required, logout_user, current_user[m
+[32m+[m
+[32m+[m
+[32m+[m[32mauth = Blueprint('auth', __name__)[m
+[32m+[m
+[32m+[m
+[32m+[m[32m@auth.route('/login', methods=['GET', 'POST'])[m
+[32m+[m[32mdef login():[m
+[32m+[m[32m    if request.method == 'POST':[m
+[32m+[m[32m        email = request.form.get('email')[m
+[32m+[m[32m        password = request.form.get('password')[m
+[32m+[m[32m        user = User.query.filter_by(email=email).first()[m
+[32m+[m[32m        if user:[m
+[32m+[m[32m            if check_password_hash(user.password, password):[m
+[32m+[m[32m                flash('Logged in successfully!', category='success')[m
+[32m+[m[32m                login_user(user, remember=True)[m
+[32m+[m[32m                return redirect(url_for('views.home'))[m
+[32m+[m[32m            else:[m
+[32m+[m[32m                flash('Incorrect password, try again.', category='error')[m
+[32m+[m[32m        else:[m
+[32m+[m[32m            flash('Email does not exist.', category='error')[m
+[32m+[m[32m    return render_template("login.html", user=current_user)[m[41m            [m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m[32m@auth.route('/logout')[m
+[32m+[m[32m@login_required[m
+[32m+[m[32mdef logout():[m
+[32m+[m[32m    logout_user()[m
+[32m+[m[32m    return redirect(url_for('views.home'))[m
+[32m+[m
+[32m+[m
+[32m+[m[32m@auth.route('/sign-up', methods=['GET', 'POST'])[m
+[32m+[m[32mdef sign_up():[m
+[32m+[m[32m    if request.method == 'POST':[m
+[32m+[m[32m        first_name = request.form.get('FirstName')[m
+[32m+[m[32m        last_name = request.form.get('LastName')[m
+[32m+[m[32m        password1 = request.form.get('password1')[m
+[32m+[m[32m        password2 = request.form.get('password2')[m
+[32m+[m[32m        phone_number = request.form.get('PhoneNumber')[m
+[32m+[m[32m        email = request.form.get('email')[m
+[32m+[m[32m        address = request.form.get('Address')[m
+[32m+[m[32m        postal_code = request.form.get('PostalCode')[m
+[32m+[m[32m        city = request.form.get('City')[m
+[32m+[m[32m        province = request.form.get('Province')[m
+[32m+[m[32m        country = request.form.get('Country')[m
+[32m+[m[41m        [m
+[32m+[m[32m        user = User.query.filter_by(email=email).first()[m
+[32m+[m[32m        if user:[m
+[32m+[m[32m            flash('Email already exists.', category='error')[m
+[32m+[m[32m        elif len(email) < 4:[m
+[32m+[m[32m            flash('Email must be greater than 3 characters.', category='error')[m
+[32m+[m[32m        elif len(first_name) < 2:[m
+[32m+[m[32m            flash('First name must be greater than 1 character.', category='error')[m
+[32m+[m[32m        elif len(last_name) < 2:[m
+[32m+[m[32m            flash('Last name must be greater than 1 character.', category='error')[m
+[32m+[m[32m        elif len(address) < 2:[m
+[32m+[m[32m            flash('Address must be greater than 1 character.', category='error')[m
+[32m+[m[32m        elif len(postal_code) < 2:[m
+[32m+[m[32m            flash('Postal Code must be greater than 1 character.', category='error')[m
+[32m+[m[32m        elif len(city) < 2:[m
+[32m+[m[32m            flash('City name must be greater than 1 character.', category='error')[m
+[32m+[m[32m        elif len(province) < 2:[m
+[32m+[m[32m            flash('Province name must be greater than 1 character.', category='error')[m
+[32m+[m[32m        elif len(country) < 2:[m
+[32m+[m[32m            flash('Country name must be greater than 1 character.', category='error')[m[41m    [m
+[32m+[m[32m        elif password1 != password2:[m
+[32m+[m[32m            flash('Passwords don\'t match.', category='error')[m
+[32m+[m[32m        elif len(password1) < 7:[m
+[32m+[m[32m            flash('Password must be at least 7 characters.', category='error')[m
+[32m+[m[32m        else:[m
+[32m+[m[32m            new_user = User(email=email, first_name=first_name, password=generate_password_hash(password1, method='pbkdf2:sha256'),last_name=last_name, phone_number=phone_number, address=address,postal_code=postal_code,city=city,province=province,country=country)[m
+[32m+[m[32m            db.session.add(new_user)[m
+[32m+[m[32m            db.session.commit()[m
+[32m+[m[32m            login_user(new_user, remember=True)[m
+[32m+[m[32m            flash('Account created!', category='success')[m
+[32m+[m[32m            return redirect(url_for('views.home'))[m
+[32m+[m[32m    return render_template("sign_up.html", user=current_user)[m
+[32m+[m
+[32m+[m[32m@auth.route('/profile', methods=['GET', 'POST'])[m
+[32m+[m[32m@login_required[m
+[32m+[m[32mdef profile():[m
+[32m+[m[32m    # First, let's fetch the current user's information from the database[m
+[32m+[m[32m    user = current_user  # Using Flask-Login's current_user, it's already the authenticated user[m
+[32m+[m[41m    [m
+[32m+[m[32m    if request.method == 'POST':[m
+[32m+[m[32m        # When the user submits the form, we update their information[m
+[32m+[m[32m        first_name = request.form['first_name'][m
+[32m+[m[32m        last_name = request.form['last_name'][m
+[32m+[m[32m        email = request.form['email'][m
+[32m+[m[32m        phone_number = request.form['phone_number'][m
+[32m+[m[32m        address = request.form['address'][m
+[32m+[m[32m        postal_code = request.form['postal_code'][m
+[32m+[m[32m        city = request.form['city'][m
+[32m+[m[32m        province = request.form['province'][m
+[32m+[m[32m        country = request.form['country'][m
+[32m+[m[41m        [m
+[32m+[m[32m        # Update the current user's details in the database[m
+[32m+[m[32m        user.first_name = first_name[m
+[32m+[m[32m        user.last_name = last_name[m
+[32m+[m[32m        user.email = email[m
+[32m+[m[32m        user.phone_number = phone_number[m
+[32m+[m[32m        user.address = address[m
+[32m+[m[32m        user.postal_code = postal_code[m
+[32m+[m[32m        user.city = city[m
+[32m+[m[32m        user.province = province[m
+[32m+[m[32m        user.country = country[m
+[32m+[m[41m        [m
+[32m+[m[32m        db.session.commit()[m
+[32m+[m
+[32m+[m[32m        flash('Your profile has been updated!', 'success')[m
+[32m+[m[32m        return redirect(url_for('auth.profile'))  # Redirect to the profile page after updating[m
+[32m+[m
+[32m+[m[32m    # GET request: Display the current user's information in the form[m
+[32m+[m[32m    return render_template('profile.html', user=user)[m
+[32m+[m
+[32m+[m[41m        [m
+[32m+[m[41m    [m
+[32m+[m
+[1mdiff --git a/venv/bin/Activate.ps1 b/venv/bin/Activate.ps1[m
+[1mnew file mode 100644[m
+[1mindex 0000000..b49d77b[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/Activate.ps1[m
+[36m@@ -0,0 +1,247 @@[m
+[32m+[m[32m<#[m[41m[m
+[32m+[m[32m.Synopsis[m[41m[m
+[32m+[m[32mActivate a Python virtual environment for the current PowerShell session.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m.Description[m[41m[m
+[32m+[m[32mPushes the python executable for a virtual environment to the front of the[m[41m[m
+[32m+[m[32m$Env:PATH environment variable and sets the prompt to signify that you are[m[41m[m
+[32m+[m[32min a Python virtual environment. Makes use of the command line switches as[m[41m[m
+[32m+[m[32mwell as the `pyvenv.cfg` file values present in the virtual environment.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m.Parameter VenvDir[m[41m[m
+[32m+[m[32mPath to the directory that contains the virtual environment to activate. The[m[41m[m
+[32m+[m[32mdefault value for this is the parent of the directory that the Activate.ps1[m[41m[m
+[32m+[m[32mscript is located within.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m.Parameter Prompt[m[41m[m
+[32m+[m[32mThe prompt prefix to display when this virtual environment is activated. By[m[41m[m
+[32m+[m[32mdefault, this prompt is the name of the virtual environment folder (VenvDir)[m[41m[m
+[32m+[m[32msurrounded by parentheses and followed by a single space (ie. '(.venv) ').[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m.Example[m[41m[m
+[32m+[m[32mActivate.ps1[m[41m[m
+[32m+[m[32mActivates the Python virtual environment that contains the Activate.ps1 script.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m.Example[m[41m[m
+[32m+[m[32mActivate.ps1 -Verbose[m[41m[m
+[32m+[m[32mActivates the Python virtual environment that contains the Activate.ps1 script,[m[41m[m
+[32m+[m[32mand shows extra information about the activation as it executes.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m.Example[m[41m[m
+[32m+[m[32mActivate.ps1 -VenvDir C:\Users\MyUser\Common\.venv[m[41m[m
+[32m+[m[32mActivates the Python virtual environment located in the specified location.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m.Example[m[41m[m
+[32m+[m[32mActivate.ps1 -Prompt "MyPython"[m[41m[m
+[32m+[m[32mActivates the Python virtual environment that contains the Activate.ps1 script,[m[41m[m
+[32m+[m[32mand prefixes the current prompt with the specified string (surrounded in[m[41m[m
+[32m+[m[32mparentheses) while the virtual environment is active.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m.Notes[m[41m[m
+[32m+[m[32mOn Windows, it may be required to enable this Activate.ps1 script by setting the[m[41m[m
+[32m+[m[32mexecution policy for the user. You can do this by issuing the following PowerShell[m[41m[m
+[32m+[m[32mcommand:[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32mPS C:\> Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32mFor more information on Execution Policies:[m[41m [m
+[32m+[m[32mhttps://go.microsoft.com/fwlink/?LinkID=135170[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m#>[m[41m[m
+[32m+[m[32mParam([m[41m[m
+[32m+[m[32m    [Parameter(Mandatory = $false)][m[41m[m
+[32m+[m[32m    [String][m[41m[m
+[32m+[m[32m    $VenvDir,[m[41m[m
+[32m+[m[32m    [Parameter(Mandatory = $false)][m[41m[m
+[32m+[m[32m    [String][m[41m[m
+[32m+[m[32m    $Prompt[m[41m[m
+[32m+[m[32m)[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m<# Function declarations --------------------------------------------------- #>[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m<#[m[41m[m
+[32m+[m[32m.Synopsis[m[41m[m
+[32m+[m[32mRemove all shell session elements added by the Activate script, including the[m[41m[m
+[32m+[m[32maddition of the virtual environment's Python executable from the beginning of[m[41m[m
+[32m+[m[32mthe PATH variable.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m.Parameter NonDestructive[m[41m[m
+[32m+[m[32mIf present, do not remove this function from the global namespace for the[m[41m[m
+[32m+[m[32msession.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m#>[m[41m[m
+[32m+[m[32mfunction global:deactivate ([switch]$NonDestructive) {[m[41m[m
+[32m+[m[32m    # Revert to original values[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    # The prior prompt:[m[41m[m
+[32m+[m[32m    if (Test-Path -Path Function:_OLD_VIRTUAL_PROMPT) {[m[41m[m
+[32m+[m[32m        Copy-Item -Path Function:_OLD_VIRTUAL_PROMPT -Destination Function:prompt[m[41m[m
+[32m+[m[32m        Remove-Item -Path Function:_OLD_VIRTUAL_PROMPT[m[41m[m
+[32m+[m[32m    }[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    # The prior PYTHONHOME:[m[41m[m
+[32m+[m[32m    if (Test-Path -Path Env:_OLD_VIRTUAL_PYTHONHOME) {[m[41m[m
+[32m+[m[32m        Copy-Item -Path Env:_OLD_VIRTUAL_PYTHONHOME -Destination Env:PYTHONHOME[m[41m[m
+[32m+[m[32m        Remove-Item -Path Env:_OLD_VIRTUAL_PYTHONHOME[m[41m[m
+[32m+[m[32m    }[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    # The prior PATH:[m[41m[m
+[32m+[m[32m    if (Test-Path -Path Env:_OLD_VIRTUAL_PATH) {[m[41m[m
+[32m+[m[32m        Copy-Item -Path Env:_OLD_VIRTUAL_PATH -Destination Env:PATH[m[41m[m
+[32m+[m[32m        Remove-Item -Path Env:_OLD_VIRTUAL_PATH[m[41m[m
+[32m+[m[32m    }[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    # Just remove the VIRTUAL_ENV altogether:[m[41m[m
+[32m+[m[32m    if (Test-Path -Path Env:VIRTUAL_ENV) {[m[41m[m
+[32m+[m[32m        Remove-Item -Path env:VIRTUAL_ENV[m[41m[m
+[32m+[m[32m    }[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    # Just remove VIRTUAL_ENV_PROMPT altogether.[m[41m[m
+[32m+[m[32m    if (Test-Path -Path Env:VIRTUAL_ENV_PROMPT) {[m[41m[m
+[32m+[m[32m        Remove-Item -Path env:VIRTUAL_ENV_PROMPT[m[41m[m
+[32m+[m[32m    }[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    # Just remove the _PYTHON_VENV_PROMPT_PREFIX altogether:[m[41m[m
+[32m+[m[32m    if (Get-Variable -Name "_PYTHON_VENV_PROMPT_PREFIX" -ErrorAction SilentlyContinue) {[m[41m[m
+[32m+[m[32m        Remove-Variable -Name _PYTHON_VENV_PROMPT_PREFIX -Scope Global -Force[m[41m[m
+[32m+[m[32m    }[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    # Leave deactivate function in the global namespace if requested:[m[41m[m
+[32m+[m[32m    if (-not $NonDestructive) {[m[41m[m
+[32m+[m[32m        Remove-Item -Path function:deactivate[m[41m[m
+[32m+[m[32m    }[m[41m[m
+[32m+[m[32m}[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m<#[m[41m[m
+[32m+[m[32m.Description[m[41m[m
+[32m+[m[32mGet-PyVenvConfig parses the values from the pyvenv.cfg file located in the[m[41m[m
+[32m+[m[32mgiven folder, and returns them in a map.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32mFor each line in the pyvenv.cfg file, if that line can be parsed into exactly[m[41m[m
+[32m+[m[32mtwo strings separated by `=` (with any amount of whitespace surrounding the =)[m[41m[m
+[32m+[m[32mthen it is considered a `key = value` line. The left hand string is the key,[m[41m[m
+[32m+[m[32mthe right hand is the value.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32mIf the value starts with a `'` or a `"` then the first and last character is[m[41m[m
+[32m+[m[32mstripped from the value before being captured.[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m.Parameter ConfigDir[m[41m[m
+[32m+[m[32mPath to the directory that contains the `pyvenv.cfg` file.[m[41m[m
+[32m+[m[32m#>[m[41m[m
+[32m+[m[32mfunction Get-PyVenvConfig([m[41m[m
+[32m+[m[32m    [String][m[41m[m
+[32m+[m[32m    $ConfigDir[m[41m[m
+[32m+[m[32m) {[m[41m[m
+[32m+[m[32m    Write-Verbose "Given ConfigDir=$ConfigDir, obtain values in pyvenv.cfg"[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    # Ensure the file exists, and issue a warning if it doesn't (but still allow the function to continue).[m[41m[m
+[32m+[m[32m    $pyvenvConfigPath = Join-Path -Resolve -Path $ConfigDir -ChildPath 'pyvenv.cfg' -ErrorAction Continue[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    # An empty map will be returned if no config file is found.[m[41m[m
+[32m+[m[32m    $pyvenvConfig = @{ }[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    if ($pyvenvConfigPath) {[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m        Write-Verbose "File exists, parse `key = value` lines"[m[41m[m
+[32m+[m[32m        $pyvenvConfigContent = Get-Content -Path $pyvenvConfigPath[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m        $pyvenvConfigContent | ForEach-Object {[m[41m[m
+[32m+[m[32m            $keyval = $PSItem -split "\s*=\s*", 2[m[41m[m
+[32m+[m[32m            if ($keyval[0] -and $keyval[1]) {[m[41m[m
+[32m+[m[32m                $val = $keyval[1][m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m                # Remove extraneous quotations around a string value.[m[41m[m
+[32m+[m[32m                if ("'""".Contains($val.Substring(0, 1))) {[m[41m[m
+[32m+[m[32m                    $val = $val.Substring(1, $val.Length - 2)[m[41m[m
+[32m+[m[32m                }[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m                $pyvenvConfig[$keyval[0]] = $val[m[41m[m
+[32m+[m[32m                Write-Verbose "Adding Key: '$($keyval[0])'='$val'"[m[41m[m
+[32m+[m[32m            }[m[41m[m
+[32m+[m[32m        }[m[41m[m
+[32m+[m[32m    }[m[41m[m
+[32m+[m[32m    return $pyvenvConfig[m[41m[m
+[32m+[m[32m}[m[41m[m
+[32m+[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m<# Begin Activate script --------------------------------------------------- #>[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m# Determine the containing directory of this script[m[41m[m
+[32m+[m[32m$VenvExecPath = Split-Path -Parent $MyInvocation.MyCommand.Definition[m[41m[m
+[32m+[m[32m$VenvExecDir = Get-Item -Path $VenvExecPath[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32mWrite-Verbose "Activation script is located in path: '$VenvExecPath'"[m[41m[m
+[32m+[m[32mWrite-Verbose "VenvExecDir Fullname: '$($VenvExecDir.FullName)"[m[41m[m
+[32m+[m[32mWrite-Verbose "VenvExecDir Name: '$($VenvExecDir.Name)"[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m# Set values required in priority: CmdLine, ConfigFile, Default[m[41m[m
+[32m+[m[32m# First, get the location of the virtual environment, it might not be[m[41m[m
+[32m+[m[32m# VenvExecDir if specified on the command line.[m[41m[m
+[32m+[m[32mif ($VenvDir) {[m[41m[m
+[32m+[m[32m    Write-Verbose "VenvDir given as parameter, using '$VenvDir' to determine values"[m[41m[m
+[32m+[m[32m}[m[41m[m
+[32m+[m[32melse {[m[41m[m
+[32m+[m[32m    Write-Verbose "VenvDir not given as a parameter, using parent directory name as VenvDir."[m[41m[m
+[32m+[m[32m    $VenvDir = $VenvExecDir.Parent.FullName.TrimEnd("\\/")[m[41m[m
+[32m+[m[32m    Write-Verbose "VenvDir=$VenvDir"[m[41m[m
+[32m+[m[32m}[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m# Next, read the `pyvenv.cfg` file to determine any required value such[m[41m[m
+[32m+[m[32m# as `prompt`.[m[41m[m
+[32m+[m[32m$pyvenvCfg = Get-PyVenvConfig -ConfigDir $VenvDir[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m# Next, set the prompt from the command line, or the config file, or[m[41m[m
+[32m+[m[32m# just use the name of the virtual environment folder.[m[41m[m
+[32m+[m[32mif ($Prompt) {[m[41m[m
+[32m+[m[32m    Write-Verbose "Prompt specified as argument, using '$Prompt'"[m[41m[m
+[32m+[m[32m}[m[41m[m
+[32m+[m[32melse {[m[41m[m
+[32m+[m[32m    Write-Verbose "Prompt not specified as argument to script, checking pyvenv.cfg value"[m[41m[m
+[32m+[m[32m    if ($pyvenvCfg -and $pyvenvCfg['prompt']) {[m[41m[m
+[32m+[m[32m        Write-Verbose "  Setting based on value in pyvenv.cfg='$($pyvenvCfg['prompt'])'"[m[41m[m
+[32m+[m[32m        $Prompt = $pyvenvCfg['prompt'];[m[41m[m
+[32m+[m[32m    }[m[41m[m
+[32m+[m[32m    else {[m[41m[m
+[32m+[m[32m        Write-Verbose "  Setting prompt based on parent's directory's name. (Is the directory name passed to venv module when creating the virtual environment)"[m[41m[m
+[32m+[m[32m        Write-Verbose "  Got leaf-name of $VenvDir='$(Split-Path -Path $venvDir -Leaf)'"[m[41m[m
+[32m+[m[32m        $Prompt = Split-Path -Path $venvDir -Leaf[m[41m[m
+[32m+[m[32m    }[m[41m[m
+[32m+[m[32m}[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32mWrite-Verbose "Prompt = '$Prompt'"[m[41m[m
+[32m+[m[32mWrite-Verbose "VenvDir='$VenvDir'"[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m# Deactivate any currently active virtual environment, but leave the[m[41m[m
+[32m+[m[32m# deactivate function in place.[m[41m[m
+[32m+[m[32mdeactivate -nondestructive[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m# Now set the environment variable VIRTUAL_ENV, used by many tools to determine[m[41m[m
+[32m+[m[32m# that there is an activated venv.[m[41m[m
+[32m+[m[32m$env:VIRTUAL_ENV = $VenvDir[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32mif (-not $Env:VIRTUAL_ENV_DISABLE_PROMPT) {[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    Write-Verbose "Setting prompt to '$Prompt'"[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    # Set the prompt to include the env name[m[41m[m
+[32m+[m[32m    # Make sure _OLD_VIRTUAL_PROMPT is global[m[41m[m
+[32m+[m[32m    function global:_OLD_VIRTUAL_PROMPT { "" }[m[41m[m
+[32m+[m[32m    Copy-Item -Path function:prompt -Destination function:_OLD_VIRTUAL_PROMPT[m[41m[m
+[32m+[m[32m    New-Variable -Name _PYTHON_VENV_PROMPT_PREFIX -Description "Python virtual environment prompt prefix" -Scope Global -Option ReadOnly -Visibility Public -Value $Prompt[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m    function global:prompt {[m[41m[m
+[32m+[m[32m        Write-Host -NoNewline -ForegroundColor Green "($_PYTHON_VENV_PROMPT_PREFIX) "[m[41m[m
+[32m+[m[32m        _OLD_VIRTUAL_PROMPT[m[41m[m
+[32m+[m[32m    }[m[41m[m
+[32m+[m[32m    $env:VIRTUAL_ENV_PROMPT = $Prompt[m[41m[m
+[32m+[m[32m}[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m# Clear PYTHONHOME[m[41m[m
+[32m+[m[32mif (Test-Path -Path Env:PYTHONHOME) {[m[41m[m
+[32m+[m[32m    Copy-Item -Path Env:PYTHONHOME -Destination Env:_OLD_VIRTUAL_PYTHONHOME[m[41m[m
+[32m+[m[32m    Remove-Item -Path Env:PYTHONHOME[m[41m[m
+[32m+[m[32m}[m[41m[m
+[32m+[m[41m[m
+[32m+[m[32m# Add the venv to the PATH[m[41m[m
+[32m+[m[32mCopy-Item -Path Env:PATH -Destination Env:_OLD_VIRTUAL_PATH[m[41m[m
+[32m+[m[32m$Env:PATH = "$VenvExecDir$([System.IO.Path]::PathSeparator)$Env:PATH"[m[41m[m
+[1mdiff --git a/venv/bin/activate b/venv/bin/activate[m
+[1mnew file mode 100644[m
+[1mindex 0000000..46b0d24[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/activate[m
+[36m@@ -0,0 +1,70 @@[m
+[32m+[m[32m# This file must be used with "source bin/activate" *from bash*[m
+[32m+[m[32m# You cannot run it directly[m
+[32m+[m
+[32m+[m[32mdeactivate () {[m
+[32m+[m[32m    # reset old environment variables[m
+[32m+[m[32m    if [ -n "${_OLD_VIRTUAL_PATH:-}" ] ; then[m
+[32m+[m[32m        PATH="${_OLD_VIRTUAL_PATH:-}"[m
+[32m+[m[32m        export PATH[m
+[32m+[m[32m        unset _OLD_VIRTUAL_PATH[m
+[32m+[m[32m    fi[m
+[32m+[m[32m    if [ -n "${_OLD_VIRTUAL_PYTHONHOME:-}" ] ; then[m
+[32m+[m[32m        PYTHONHOME="${_OLD_VIRTUAL_PYTHONHOME:-}"[m
+[32m+[m[32m        export PYTHONHOME[m
+[32m+[m[32m        unset _OLD_VIRTUAL_PYTHONHOME[m
+[32m+[m[32m    fi[m
+[32m+[m
+[32m+[m[32m    # Call hash to forget past commands. Without forgetting[m
+[32m+[m[32m    # past commands the $PATH changes we made may not be respected[m
+[32m+[m[32m    hash -r 2> /dev/null[m
+[32m+[m
+[32m+[m[32m    if [ -n "${_OLD_VIRTUAL_PS1:-}" ] ; then[m
+[32m+[m[32m        PS1="${_OLD_VIRTUAL_PS1:-}"[m
+[32m+[m[32m        export PS1[m
+[32m+[m[32m        unset _OLD_VIRTUAL_PS1[m
+[32m+[m[32m    fi[m
+[32m+[m
+[32m+[m[32m    unset VIRTUAL_ENV[m
+[32m+[m[32m    unset VIRTUAL_ENV_PROMPT[m
+[32m+[m[32m    if [ ! "${1:-}" = "nondestructive" ] ; then[m
+[32m+[m[32m    # Self destruct![m
+[32m+[m[32m        unset -f deactivate[m
+[32m+[m[32m    fi[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m# unset irrelevant variables[m
+[32m+[m[32mdeactivate nondestructive[m
+[32m+[m
+[32m+[m[32m# on Windows, a path can contain colons and backslashes and has to be converted:[m
+[32m+[m[32mif [ "${OSTYPE:-}" = "cygwin" ] || [ "${OSTYPE:-}" = "msys" ] ; then[m
+[32m+[m[32m    # transform D:\path\to\venv to /d/path/to/venv on MSYS[m
+[32m+[m[32m    # and to /cygdrive/d/path/to/venv on Cygwin[m
+[32m+[m[32m    export VIRTUAL_ENV=$(cygpath /home/imed/webApp/venv)[m
+[32m+[m[32melse[m
+[32m+[m[32m    # use the path as-is[m
+[32m+[m[32m    export VIRTUAL_ENV=/home/imed/webApp/venv[m
+[32m+[m[32mfi[m
+[32m+[m
+[32m+[m[32m_OLD_VIRTUAL_PATH="$PATH"[m
+[32m+[m[32mPATH="$VIRTUAL_ENV/"bin":$PATH"[m
+[32m+[m[32mexport PATH[m
+[32m+[m
+[32m+[m[32m# unset PYTHONHOME if set[m
+[32m+[m[32m# this will fail if PYTHONHOME is set to the empty string (which is bad anyway)[m
+[32m+[m[32m# could use `if (set -u; : $PYTHONHOME) ;` in bash[m
+[32m+[m[32mif [ -n "${PYTHONHOME:-}" ] ; then[m
+[32m+[m[32m    _OLD_VIRTUAL_PYTHONHOME="${PYTHONHOME:-}"[m
+[32m+[m[32m    unset PYTHONHOME[m
+[32m+[m[32mfi[m
+[32m+[m
+[32m+[m[32mif [ -z "${VIRTUAL_ENV_DISABLE_PROMPT:-}" ] ; then[m
+[32m+[m[32m    _OLD_VIRTUAL_PS1="${PS1:-}"[m
+[32m+[m[32m    PS1='(venv) '"${PS1:-}"[m
+[32m+[m[32m    export PS1[m
+[32m+[m[32m    VIRTUAL_ENV_PROMPT='(venv) '[m
+[32m+[m[32m    export VIRTUAL_ENV_PROMPT[m
+[32m+[m[32mfi[m
+[32m+[m
+[32m+[m[32m# Call hash to forget past commands. Without forgetting[m
+[32m+[m[32m# past commands the $PATH changes we made may not be respected[m
+[32m+[m[32mhash -r 2> /dev/null[m
+[1mdiff --git a/venv/bin/activate.csh b/venv/bin/activate.csh[m
+[1mnew file mode 100644[m
+[1mindex 0000000..28b52dd[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/activate.csh[m
+[36m@@ -0,0 +1,27 @@[m
+[32m+[m[32m# This file must be used with "source bin/activate.csh" *from csh*.[m
+[32m+[m[32m# You cannot run it directly.[m
+[32m+[m
+[32m+[m[32m# Created by Davide Di Blasi <davidedb@gmail.com>.[m
+[32m+[m[32m# Ported to Python 3.3 venv by Andrew Svetlov <andrew.svetlov@gmail.com>[m
+[32m+[m
+[32m+[m[32malias deactivate 'test $?_OLD_VIRTUAL_PATH != 0 && setenv PATH "$_OLD_VIRTUAL_PATH" && unset _OLD_VIRTUAL_PATH; rehash; test $?_OLD_VIRTUAL_PROMPT != 0 && set prompt="$_OLD_VIRTUAL_PROMPT" && unset _OLD_VIRTUAL_PROMPT; unsetenv VIRTUAL_ENV; unsetenv VIRTUAL_ENV_PROMPT; test "\!:*" != "nondestructive" && unalias deactivate'[m
+[32m+[m
+[32m+[m[32m# Unset irrelevant variables.[m
+[32m+[m[32mdeactivate nondestructive[m
+[32m+[m
+[32m+[m[32msetenv VIRTUAL_ENV /home/imed/webApp/venv[m
+[32m+[m
+[32m+[m[32mset _OLD_VIRTUAL_PATH="$PATH"[m
+[32m+[m[32msetenv PATH "$VIRTUAL_ENV/"bin":$PATH"[m
+[32m+[m
+[32m+[m
+[32m+[m[32mset _OLD_VIRTUAL_PROMPT="$prompt"[m
+[32m+[m
+[32m+[m[32mif (! "$?VIRTUAL_ENV_DISABLE_PROMPT") then[m
+[32m+[m[32m    set prompt = '(venv) '"$prompt"[m
+[32m+[m[32m    setenv VIRTUAL_ENV_PROMPT '(venv) '[m
+[32m+[m[32mendif[m
+[32m+[m
+[32m+[m[32malias pydoc python -m pydoc[m
+[32m+[m
+[32m+[m[32mrehash[m
+[1mdiff --git a/venv/bin/activate.fish b/venv/bin/activate.fish[m
+[1mnew file mode 100644[m
+[1mindex 0000000..1d683e1[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/activate.fish[m
+[36m@@ -0,0 +1,69 @@[m
+[32m+[m[32m# This file must be used with "source <venv>/bin/activate.fish" *from fish*[m
+[32m+[m[32m# (https://fishshell.com/). You cannot run it directly.[m
+[32m+[m
+[32m+[m[32mfunction deactivate  -d "Exit virtual environment and return to normal shell environment"[m
+[32m+[m[32m    # reset old environment variables[m
+[32m+[m[32m    if test -n "$_OLD_VIRTUAL_PATH"[m
+[32m+[m[32m        set -gx PATH $_OLD_VIRTUAL_PATH[m
+[32m+[m[32m        set -e _OLD_VIRTUAL_PATH[m
+[32m+[m[32m    end[m
+[32m+[m[32m    if test -n "$_OLD_VIRTUAL_PYTHONHOME"[m
+[32m+[m[32m        set -gx PYTHONHOME $_OLD_VIRTUAL_PYTHONHOME[m
+[32m+[m[32m        set -e _OLD_VIRTUAL_PYTHONHOME[m
+[32m+[m[32m    end[m
+[32m+[m
+[32m+[m[32m    if test -n "$_OLD_FISH_PROMPT_OVERRIDE"[m
+[32m+[m[32m        set -e _OLD_FISH_PROMPT_OVERRIDE[m
+[32m+[m[32m        # prevents error when using nested fish instances (Issue #93858)[m
+[32m+[m[32m        if functions -q _old_fish_prompt[m
+[32m+[m[32m            functions -e fish_prompt[m
+[32m+[m[32m            functions -c _old_fish_prompt fish_prompt[m
+[32m+[m[32m            functions -e _old_fish_prompt[m
+[32m+[m[32m        end[m
+[32m+[m[32m    end[m
+[32m+[m
+[32m+[m[32m    set -e VIRTUAL_ENV[m
+[32m+[m[32m    set -e VIRTUAL_ENV_PROMPT[m
+[32m+[m[32m    if test "$argv[1]" != "nondestructive"[m
+[32m+[m[32m        # Self-destruct![m
+[32m+[m[32m        functions -e deactivate[m
+[32m+[m[32m    end[m
+[32m+[m[32mend[m
+[32m+[m
+[32m+[m[32m# Unset irrelevant variables.[m
+[32m+[m[32mdeactivate nondestructive[m
+[32m+[m
+[32m+[m[32mset -gx VIRTUAL_ENV /home/imed/webApp/venv[m
+[32m+[m
+[32m+[m[32mset -gx _OLD_VIRTUAL_PATH $PATH[m
+[32m+[m[32mset -gx PATH "$VIRTUAL_ENV/"bin $PATH[m
+[32m+[m
+[32m+[m[32m# Unset PYTHONHOME if set.[m
+[32m+[m[32mif set -q PYTHONHOME[m
+[32m+[m[32m    set -gx _OLD_VIRTUAL_PYTHONHOME $PYTHONHOME[m
+[32m+[m[32m    set -e PYTHONHOME[m
+[32m+[m[32mend[m
+[32m+[m
+[32m+[m[32mif test -z "$VIRTUAL_ENV_DISABLE_PROMPT"[m
+[32m+[m[32m    # fish uses a function instead of an env var to generate the prompt.[m
+[32m+[m
+[32m+[m[32m    # Save the current fish_prompt function as the function _old_fish_prompt.[m
+[32m+[m[32m    functions -c fish_prompt _old_fish_prompt[m
+[32m+[m
+[32m+[m[32m    # With the original prompt function renamed, we can override with our own.[m
+[32m+[m[32m    function fish_prompt[m
+[32m+[m[32m        # Save the return status of the last command.[m
+[32m+[m[32m        set -l old_status $status[m
+[32m+[m
+[32m+[m[32m        # Output the venv prompt; color taken from the blue of the Python logo.[m
+[32m+[m[32m        printf "%s%s%s" (set_color 4B8BBE) '(venv) ' (set_color normal)[m
+[32m+[m
+[32m+[m[32m        # Restore the return status of the previous command.[m
+[32m+[m[32m        echo "exit $old_status" | .[m
+[32m+[m[32m        # Output the original/"old" prompt.[m
+[32m+[m[32m        _old_fish_prompt[m
+[32m+[m[32m    end[m
+[32m+[m
+[32m+[m[32m    set -gx _OLD_FISH_PROMPT_OVERRIDE "$VIRTUAL_ENV"[m
+[32m+[m[32m    set -gx VIRTUAL_ENV_PROMPT '(venv) '[m
+[32m+[m[32mend[m
+[1mdiff --git a/venv/bin/alembic b/venv/bin/alembic[m
+[1mnew file mode 100755[m
+[1mindex 0000000..ec67526[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/alembic[m
+[36m@@ -0,0 +1,8 @@[m
+[32m+[m[32m#!/home/imed/webApp/venv/bin/python3[m
+[32m+[m[32m# -*- coding: utf-8 -*-[m
+[32m+[m[32mimport re[m
+[32m+[m[32mimport sys[m
+[32m+[m[32mfrom alembic.config import main[m
+[32m+[m[32mif __name__ == '__main__':[m
+[32m+[m[32m    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])[m
+[32m+[m[32m    sys.exit(main())[m
+[1mdiff --git a/venv/bin/flask b/venv/bin/flask[m
+[1mnew file mode 100755[m
+[1mindex 0000000..99205ab[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/flask[m
+[36m@@ -0,0 +1,8 @@[m
+[32m+[m[32m#!/home/imed/webApp/venv/bin/python3[m
+[32m+[m[32m# -*- coding: utf-8 -*-[m
+[32m+[m[32mimport re[m
+[32m+[m[32mimport sys[m
+[32m+[m[32mfrom flask.cli import main[m
+[32m+[m[32mif __name__ == '__main__':[m
+[32m+[m[32m    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])[m
+[32m+[m[32m    sys.exit(main())[m
+[1mdiff --git a/venv/bin/mako-render b/venv/bin/mako-render[m
+[1mnew file mode 100755[m
+[1mindex 0000000..7a7e905[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/mako-render[m
+[36m@@ -0,0 +1,8 @@[m
+[32m+[m[32m#!/home/imed/webApp/venv/bin/python3[m
+[32m+[m[32m# -*- coding: utf-8 -*-[m
+[32m+[m[32mimport re[m
+[32m+[m[32mimport sys[m
+[32m+[m[32mfrom mako.cmd import cmdline[m
+[32m+[m[32mif __name__ == '__main__':[m
+[32m+[m[32m    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])[m
+[32m+[m[32m    sys.exit(cmdline())[m
+[1mdiff --git a/venv/bin/pip b/venv/bin/pip[m
+[1mnew file mode 100755[m
+[1mindex 0000000..4d9ff3c[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/pip[m
+[36m@@ -0,0 +1,8 @@[m
+[32m+[m[32m#!/home/imed/webApp/venv/bin/python3[m
+[32m+[m[32m# -*- coding: utf-8 -*-[m
+[32m+[m[32mimport re[m
+[32m+[m[32mimport sys[m
+[32m+[m[32mfrom pip._internal.cli.main import main[m
+[32m+[m[32mif __name__ == '__main__':[m
+[32m+[m[32m    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])[m
+[32m+[m[32m    sys.exit(main())[m
+[1mdiff --git a/venv/bin/pip3 b/venv/bin/pip3[m
+[1mnew file mode 100755[m
+[1mindex 0000000..4d9ff3c[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/pip3[m
+[36m@@ -0,0 +1,8 @@[m
+[32m+[m[32m#!/home/imed/webApp/venv/bin/python3[m
+[32m+[m[32m# -*- coding: utf-8 -*-[m
+[32m+[m[32mimport re[m
+[32m+[m[32mimport sys[m
+[32m+[m[32mfrom pip._internal.cli.main import main[m
+[32m+[m[32mif __name__ == '__main__':[m
+[32m+[m[32m    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])[m
+[32m+[m[32m    sys.exit(main())[m
+[1mdiff --git a/venv/bin/pip3.12 b/venv/bin/pip3.12[m
+[1mnew file mode 100755[m
+[1mindex 0000000..4d9ff3c[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/pip3.12[m
+[36m@@ -0,0 +1,8 @@[m
+[32m+[m[32m#!/home/imed/webApp/venv/bin/python3[m
+[32m+[m[32m# -*- coding: utf-8 -*-[m
+[32m+[m[32mimport re[m
+[32m+[m[32mimport sys[m
+[32m+[m[32mfrom pip._internal.cli.main import main[m
+[32m+[m[32mif __name__ == '__main__':[m
+[32m+[m[32m    sys.argv[0] = re.sub(r'(-script\.pyw|\.exe)?$', '', sys.argv[0])[m
+[32m+[m[32m    sys.exit(main())[m
+[1mdiff --git a/venv/bin/python b/venv/bin/python[m
+[1mnew file mode 120000[m
+[1mindex 0000000..b8a0adb[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/python[m
+[36m@@ -0,0 +1 @@[m
+[32m+[m[32mpython3[m
+\ No newline at end of file[m
+[1mdiff --git a/venv/bin/python3 b/venv/bin/python3[m
+[1mnew file mode 120000[m
+[1mindex 0000000..ae65fda[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/python3[m
+[36m@@ -0,0 +1 @@[m
+[32m+[m[32m/usr/bin/python3[m
+\ No newline at end of file[m
+[1mdiff --git a/venv/bin/python3.12 b/venv/bin/python3.12[m
+[1mnew file mode 120000[m
+[1mindex 0000000..b8a0adb[m
+[1m--- /dev/null[m
+[1m+++ b/venv/bin/python3.12[m
+[36m@@ -0,0 +1 @@[m
+[32m+[m[32mpython3[m
+\ No newline at end of file[m
+[1mdiff --git a/venv/cpanel.py b/venv/cpanel.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..0f50f3c[m
+[1m--- /dev/null[m
+[1m+++ b/venv/cpanel.py[m
+[36m@@ -0,0 +1,173 @@[m
+[32m+[m[32mfrom flask import Flask, render_template, redirect, url_for, flash, Blueprint, request, session[m
+[32m+[m[32mfrom .models import User, HST, Product, AuthenticationAdmin[m
+[32m+[m[32mfrom . import db[m
+[32m+[m[32mfrom flask_login import login_user, current_user, login_required, logout_user[m
+[32m+[m[32mfrom werkzeug.security import generate_password_hash, check_password_hash[m
+[32m+[m
+[32m+[m[32mcpanel = Blueprint('cpanel', __name__)[m
+[32m+[m
+[32m+[m[32m# Admin Login[m
+[32m+[m[32m@cpanel.route('/cpanel/login', methods=['GET', 'POST'])[m
+[32m+[m[32mdef admin_login():[m
+[32m+[m[32m    if request.method == 'POST':[m
+[32m+[m[32m        login = request.form.get('login')[m
+[32m+[m[32m        password = request.form.get('password')[m
+[32m+[m
+[32m+[m[32m        # Check admin credentials[m
+[32m+[m[32m        admin = AuthenticationAdmin.query.filter_by(login=login).first()[m
+[32m+[m[32m        if admin and check_password_hash(admin.password, password):[m
+[32m+[m[32m            session['admin_authenticated'] = True[m
+[32m+[m[32m            flash('Admin login successful!', 'success')[m
+[32m+[m[32m            return redirect(url_for('cpanel.cpanel_admin'))[m
+[32m+[m[32m        else:[m
+[32m+[m[32m            flash('Invalid login credentials.', 'danger')[m
+[32m+[m
+[32m+[m[32m    return render_template('admin_login.html')[m
+[32m+[m
+[32m+[m[32m# Admin Logout[m
+[32m+[m[32m@cpanel.route('/cpanel/logout')[m
+[32m+[m[32mdef admin_logout():[m
+[32m+[m[32m    session.pop('admin_authenticated', None)[m
+[32m+[m[32m    flash('Admin logged out successfully.', 'success')[m
+[32m+[m[32m    return redirect(url_for('cpanel.admin_login'))[m
+[32m+[m
+[32m+[m[32m# Admin Dashboard[m
+[32m+[m[32m@cpanel.route('/cpanel')[m
+[32m+[m[32mdef cpanel_admin():[m
+[32m+[m[32m    if not session.get('admin_authenticated'):[m
+[32m+[m[32m        flash('You must be logged in as an admin to access this page.', 'danger')[m
+[32m+[m[32m        return redirect(url_for('cpanel.admin_login'))[m
+[32m+[m[41m    [m
+[32m+[m[32m    # Fetch data for the admin dashboard[m
+[32m+[m[32m    users = User.query.all()  # Fetch all users[m
+[32m+[m[32m    hst_entries = {hst.province: hst for hst in HST.query.all()}  # Fetch HST entries[m
+[32m+[m[32m    products = Product.query.all()  # Fetch all products[m
+[32m+[m[41m    [m
+[32m+[m[32m    return render_template("cpanel.html", users=users, hst_entries=hst_entries, products=products)[m
+[32m+[m
+[32m+[m[32m# Add Product[m
+[32m+[m[32m@cpanel.route('/cpanel/products/add', methods=['GET', 'POST'])[m
+[32m+[m[32mdef add_product():[m
+[32m+[m[32m    if not session.get('admin_authenticated'):[m
+[32m+[m[32m        flash('You must be logged in as an admin to access this page.', 'danger')[m
+[32m+[m[32m        return redirect(url_for('cpanel.admin_login'))[m
+[32m+[m
+[32m+[m[32m    if request.method == 'POST':[m
+[32m+[m[32m        name = request.form.get('name')[m
+[32m+[m[32m        unit_price = request.form.get('unit_price', type=float)[m
+[32m+[m[32m        qte_max = request.form.get('qte_max', type=int)[m
+[32m+[m[32m        qte_refill = request.form.get('qte_refill', type=int)[m
+[32m+[m[32m        qte_alert = request.form.get('qte_alert', type=int)[m
+[32m+[m[32m        reference = request.form.get('reference')[m
+[32m+[m[32m        categories = request.form.get('categories')[m
+[32m+[m[32m        description = request.form.get('description')[m
+[32m+[m[41m        [m
+[32m+[m[32m        # Handle image upload[m
+[32m+[m[32m        image = request.files.get('image')[m
+[32m+[m[32m        image_data = image.read() if image else None[m
+[32m+[m
+[32m+[m[32m        # Add the product to the database[m
+[32m+[m[32m        new_product = Product([m
+[32m+[m[32m            name=name,[m
+[32m+[m[32m            unit_price=unit_price,[m
+[32m+[m[32m            qte_max=qte_max,[m
+[32m+[m[32m            qte_refill=qte_refill,[m
+[32m+[m[32m            qte_alert=qte_alert,[m
+[32m+[m[32m            reference=reference,[m
+[32m+[m[32m            categories=categories,[m
+[32m+[m[32m            description=description,[m
+[32m+[m[32m            image_data=image_data[m
+[32m+[m[32m        )[m
+[32m+[m[32m        db.session.add(new_product)[m
+[32m+[m[32m        db.session.commit()[m
+[32m+[m
+[32m+[m[32m        flash('Product added successfully!', 'success')[m
+[32m+[m[32m        return redirect(url_for('cpanel.cpanel_admin') + '#products')[m
+[32m+[m
+[32m+[m[32m    return render_template('add_product.html', user=current_user)[m
+[32m+[m
+[32m+[m[32m# Edit and Delete Products (as implemented in your code)[m
+[32m+[m[32m@cpanel.route('/cpanel/products/edit/<int:product_id>', methods=['GET', 'POST'])[m
+[32m+[m
+[32m+[m[32mdef edit_product(product_id):[m
+[32m+[m[32m    product = Product.query.get_or_404(product_id)[m
+[32m+[m
+[32m+[m[32m    if request.method == 'POST':[m
+[32m+[m[32m        product.name = request.form['name'][m
+[32m+[m[32m        product.unit_price = float(request.form['unit_price'])[m
+[32m+[m[32m        product.qte_max = int(request.form['qte_max'])[m
+[32m+[m[32m        product.qte_refill = int(request.form['qte_refill'])[m
+[32m+[m[32m        product.qte_alert = int(request.form['qte_alert'])[m
+[32m+[m[32m        product.reference = request.form['reference'][m
+[32m+[m
+[32m+[m[32m        # Handle optional image update[m
+[32m+[m[32m        image_file = request.files['image'][m
+[32m+[m[32m        if image_file:[m
+[32m+[m[32m            product.image = image_file.read()  # Update binary image data[m
+[32m+[m
+[32m+[m[32m        db.session.commit()[m
+[32m+[m[32m        flash('Product updated successfully!', 'success')[m
+[32m+[m[32m        return redirect(url_for('cpanel.cpanel_admin') + '#products')[m
+[32m+[m
+[32m+[m[32m    return render_template('edit_product.html', product=product, user=current_user)[m
+[32m+[m
+[32m+[m
+[32m+[m[32m@cpanel.route('/cpanel/products/delete/<int:product_id>', methods=['POST'])[m
+[32m+[m[32mdef delete_product(product_id):[m
+[32m+[m[32m    product = Product.query.get_or_404(product_id)[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        db.session.delete(product)[m
+[32m+[m[32m        db.session.commit()[m
+[32m+[m[32m        flash('Product deleted successfully!', 'success')[m
+[32m+[m[32m    except Exception as e:[m
+[32m+[m[32m        db.session.rollback()[m
+[32m+[m[32m        flash(f'Error deleting product: {str(e)}', 'error')[m
+[32m+[m
+[32m+[m[32m    return redirect(url_for('cpanel.cpanel_admin') + '#products')[m
+[32m+[m
+[32m+[m[32m# CRUD for Users (already implemented)[m
+[32m+[m
+[32m+[m[32m@cpanel.route('/cpanel/users/delete/<int:user_id>', methods=['POST'])[m
+[32m+[m[32mdef delete_user(user_id):[m
+[32m+[m[32m    user = User.query.get_or_404(user_id)[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        db.session.delete(user)[m
+[32m+[m[32m        db.session.commit()[m
+[32m+[m[32m        flash('User deleted successfully!', 'success')[m
+[32m+[m[32m    except Exception as e:[m
+[32m+[m[32m        db.session.rollback()[m
+[32m+[m[32m        flash(f'Error deleting user: {str(e)}', 'error')[m
+[32m+[m[32m    return redirect(url_for('cpanel.cpanel_admin'))[m
+[32m+[m
+[32m+[m[32m@cpanel.route('/cpanel/users/edit/<int:user_id>', methods=['GET', 'POST'])[m
+[32m+[m[32mdef edit_user(user_id):[m
+[32m+[m[32m    user = User.query.get_or_404(user_id)[m
+[32m+[m[32m    if request.method == 'POST':[m
+[32m+[m[32m        try:[m
+[32m+[m[32m            user.first_name = request.form['first_name'][m
+[32m+[m[32m            user.last_name = request.form['last_name'][m
+[32m+[m[32m            user.email = request.form['email'][m
+[32m+[m[32m            user.phone_number = request.form['phone_number'][m
+[32m+[m[32m            user.address = request.form['address'][m
+[32m+[m[32m            user.postal_code = request.form['postal_code'][m
+[32m+[m[32m            user.city = request.form['city'][m
+[32m+[m[32m            user.province = request.form['province'][m
+[32m+[m[32m            user.country = request.form['country'][m
+[32m+[m[41m            [m
+[32m+[m[32m            db.session.commit()[m
+[32m+[m[32m            flash('User information updated successfully!', 'success')[m
+[32m+[m[32m            return redirect(url_for('cpanel.cpanel_admin'))[m
+[32m+[m[32m        except Exception as e:[m
+[32m+[m[32m            db.session.rollback()[m
+[32m+[m[32m            flash(f'Error updating user: {str(e)}', 'error')[m
+[32m+[m
+[32m+[m[32m    return render_template('edit_user.html', user=user)[m
+[32m+[m
+[32m+[m[32mdef get_hst_for_user(user):[m
+[32m+[m[32m    """Fetch the HST value for a user based on their province."""[m
+[32m+[m[32m    hst_entry = HST.query.filter_by(province=user.province).first()[m
+[32m+[m[32m    return hst_entry.hst_value if hst_entry else 0  # Default to 0 if no entry exists[m
+[32m+[m
+[32m+[m
+[32m+[m
+[32m+[m
+[1mdiff --git a/venv/get-pip.py b/venv/get-pip.py[m
+[1mnew file mode 100644[m
+[1mindex 0000000..74afb5a[m
+[1m--- /dev/null[m
+[1m+++ b/venv/get-pip.py[m
+[36m@@ -0,0 +1,28535 @@[m
+[32m+[m[32m#!/usr/bin/env python[m
+[32m+[m[32m#[m
+[32m+[m[32m# Hi There![m
+[32m+[m[32m#[m
+[32m+[m[32m# You may be wondering what this giant blob of binary data here is, you might[m
+[32m+[m[32m# even be worried that we're up to something nefarious (good for you for being[m
+[32m+[m[32m# paranoid!). This is a base85 encoding of a zip file, this zip file contains[m
+[32m+[m[32m# an entire copy of pip (version 24.3.1).[m
+[32m+[m[32m#[m
+[32m+[m[32m# Pip is a thing that installs packages, pip itself is a package that someone[m
+[32m+[m[32m# might want to install, especially if they're looking to run this get-pip.py[m
+[32m+[m[32m# script. Pip has a lot of code to deal with the security of installing[m
+[32m+[m[32m# packages, various edge cases on various platforms, and other such sort of[m
+[32m+[m[32m# "tribal knowledge" that has been encoded in its code base. Because of this[m
+[32m+[m[32m# we basically include an entire copy of pip inside this blob. We do this[m
+[32m+[m[32m# because the alternatives are attempt to implement a "minipip" that probably[m
+[32m+[m[32m# doesn't do things correctly and has weird edge cases, or compress pip itself[m
+[32m+[m[32m# down into a single file.[m
+[32m+[m[32m#[m
+[32m+[m[32m# If you're wondering how this is created, it is generated using[m
+[32m+[m[32m# `scripts/generate.py` in https://github.com/pypa/get-pip.[m
+[32m+[m
+[32m+[m[32mimport sys[m
+[32m+[m
+[32m+[m[32mthis_python = sys.version_info[:2][m
+[32m+[m[32mmin_version = (3, 8)[m
+[32m+[m[32mif this_python < min_version:[m
+[32m+[m[32m    message_parts = [[m
+[32m+[m[32m        "This script does not work on Python {}.{}.".format(*this_python),[m
+[32m+[m[32m        "The minimum supported Python version is {}.{}.".format(*min_version),[m
+[32m+[m[32m        "Please use https://bootstrap.pypa.io/pip/{}.{}/get-pip.py instead.".format(*this_python),[m
+[32m+[m[32m    ][m
+[32m+[m[32m    print("ERROR: " + " ".join(message_parts))[m
+[32m+[m[32m    sys.exit(1)[m
+[32m+[m
+[32m+[m
+[32m+[m[32mimport os.path[m
+[32m+[m[32mimport pkgutil[m
+[32m+[m[32mimport shutil[m
+[32m+[m[32mimport tempfile[m
+[32m+[m[32mimport argparse[m
+[32m+[m[32mimport importlib[m
+[32m+[m[32mfrom base64 import b85decode[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef include_setuptools(args):[m
+[32m+[m[32m    """[m
+[32m+[m[32m    Install setuptools only if absent, not excluded and when using Python <3.12.[m
+[32m+[m[32m    """[m
+[32m+[m[32m    cli = not args.no_setuptools[m
+[32m+[m[32m    env = not os.environ.get("PIP_NO_SETUPTOOLS")[m
+[32m+[m[32m    absent = not importlib.util.find_spec("setuptools")[m
+[32m+[m[32m    python_lt_3_12 = this_python < (3, 12)[m
+[32m+[m[32m    return cli and env and absent and python_lt_3_12[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef include_wheel(args):[m
+[32m+[m[32m    """[m
+[32m+[m[32m    Install wheel only if absent, not excluded and when using Python <3.12.[m
+[32m+[m[32m    """[m
+[32m+[m[32m    cli = not args.no_wheel[m
+[32m+[m[32m    env = not os.environ.get("PIP_NO_WHEEL")[m
+[32m+[m[32m    absent = not importlib.util.find_spec("wheel")[m
+[32m+[m[32m    python_lt_3_12 = this_python < (3, 12)[m
+[32m+[m[32m    return cli and env and absent and python_lt_3_12[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef determine_pip_install_arguments():[m
+[32m+[m[32m    pre_parser = argparse.ArgumentParser()[m
+[32m+[m[32m    pre_parser.add_argument("--no-setuptools", action="store_true")[m
+[32m+[m[32m    pre_parser.add_argument("--no-wheel", action="store_true")[m
+[32m+[m[32m    pre, args = pre_parser.parse_known_args()[m
+[32m+[m
+[32m+[m[32m    args.append("pip")[m
+[32m+[m
+[32m+[m[32m    if include_setuptools(pre):[m
+[32m+[m[32m        args.append("setuptools")[m
+[32m+[m
+[32m+[m[32m    if include_wheel(pre):[m
+[32m+[m[32m        args.append("wheel")[m
+[32m+[m
+[32m+[m[32m    return ["install", "--upgrade", "--force-reinstall"] + args[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef monkeypatch_for_cert(tmpdir):[m
+[32m+[m[32m    """Patches `pip install` to provide default certificate with the lowest priority.[m
+[32m+[m
+[32m+[m[32m    This ensures that the bundled certificates are used unless the user specifies a[m
+[32m+[m[32m    custom cert via any of pip's option passing mechanisms (config, env-var, CLI).[m
+[32m+[m
+[32m+[m[32m    A monkeypatch is the easiest way to achieve this, without messing too much with[m
+[32m+[m[32m    the rest of pip's internals.[m
+[32m+[m[32m    """[m
+[32m+[m[32m    from pip._internal.commands.install import InstallCommand[m
+[32m+[m
+[32m+[m[32m    # We want to be using the internal certificates.[m
+[32m+[m[32m    cert_path = os.path.join(tmpdir, "cacert.pem")[m
+[32m+[m[32m    with open(cert_path, "wb") as cert:[m
+[32m+[m[32m        cert.write(pkgutil.get_data("pip._vendor.certifi", "cacert.pem"))[m
+[32m+[m
+[32m+[m[32m    install_parse_args = InstallCommand.parse_args[m
+[32m+[m
+[32m+[m[32m    def cert_parse_args(self, args):[m
+[32m+[m[32m        if not self.parser.get_default_values().cert:[m
+[32m+[m[32m            # There are no user provided cert -- force use of bundled cert[m
+[32m+[m[32m            self.parser.defaults["cert"] = cert_path  # calculated above[m
+[32m+[m[32m        return install_parse_args(self, args)[m
+[32m+[m
+[32m+[m[32m    InstallCommand.parse_args = cert_parse_args[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef bootstrap(tmpdir):[m
+[32m+[m[32m    monkeypatch_for_cert(tmpdir)[m
+[32m+[m
+[32m+[m[32m    # Execute the included pip and use it to install the latest pip and[m
+[32m+[m[32m    # any user-requested packages from PyPI.[m
+[32m+[m[32m    from pip._internal.cli.main import main as pip_entry_point[m
+[32m+[m[32m    args = determine_pip_install_arguments()[m
+[32m+[m[32m    sys.exit(pip_entry_point(args))[m
+[32m+[m
+[32m+[m
+[32m+[m[32mdef main():[m
+[32m+[m[32m    tmpdir = None[m
+[32m+[m[32m    try:[m
+[32m+[m[32m        # Create a temporary working directory[m
+[32m+[m[32m        tmpdir = tempfile.mkdtemp()[m
+[32m+[m
+[32m+[m[32m        # Unpack the zipfile into the temporary directory[m
+[32m+[m[32m        pip_zip = os.path.join(tmpdir, "pip.zip")[m
+[32m+[m[32m        with open(pip_zip, "wb") as fp:[m
+[32m+[m[32m            fp.write(b85decode(DATA.replace(b"\n", b"")))[m
+[32m+[m
+[32m+[m[32m        # Add the zipfile to sys.path so that we can import it[m
+[32m+[m[32m        sys.path.insert(0, pip_zip)[m
+[32m+[m
+[32m+[m[32m        # Run the bootstrap[m
+[32m+[m[32m        bootstrap(tmpdir=tmpdir)[m
+[32m+[m[32m    finally:[m
+[32m+[m[32m        # Clean up our temporary working directo

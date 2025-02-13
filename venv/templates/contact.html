@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="text-center">
+        <h1 class="mb-4 display-4 fw-bold">Contact Us</h1>
+        <p class="lead text-muted">
+            We’d love to hear from you! Whether you have a question, need assistance, or just want to say hello, feel free to reach out.
+        </p>
+    </div>
+
+    <div class="row mt-5">
+        <!-- Contact Information -->
+        <div class="col-md-6 mb-4">
+            <h2 class="fw-bold">Our Office</h2>
+            <p class="text-muted">
+                <strong>Cell Phone E-Commerce Store</strong><br>
+                123 Tech Avenue, Suite 500<br>
+                Cityville, Techland 12345
+            </p>
+            <p>
+                <i class="fas fa-phone-alt text-primary"></i> <strong>Phone:</strong> +1 (123) 456-7890<br>
+                <i class="fas fa-envelope text-primary"></i> <strong>Email:</strong> support@cellstore.com
+            </p>
+            <p>
+                <i class="fas fa-clock text-primary"></i> <strong>Business Hours:</strong><br>
+                Monday - Friday: 9:00 AM - 6:00 PM<br>
+                Saturday: 10:00 AM - 4:00 PM<br>
+                Sunday: Closed
+            </p>
+        </div>
+
+        <!-- Contact Form -->
+        <div class="col-md-6">
+            <h2 class="fw-bold">Send Us a Message</h2>
+            <form method="POST" action="{{ url_for('views.submit_contact') }}">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Your Name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea class="form-control" id="message" name="message" rows="5" placeholder="Your Message" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

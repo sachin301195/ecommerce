@@ -44,3 +44,12 @@ class AuthenticationAdmin(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)  # ID (PK)
     login = db.Column(db.String(150), unique=True, nullable=False)  # Login
     password = db.Column(db.String(150), nullable=False)  # Password
+    
+
+class CompanyInfo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(150), nullable=False)
+    email = db.Column(db.String(150), nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
+    website = db.Column(db.String(255), nullable=True)

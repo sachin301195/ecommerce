@@ -1,97 +1,78 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container-fluid mt-5 px-5">  <!-- ✅ Wider layout, less side space -->
     
-    <h1 class="mb-4">Admin Control Panel</h1>
-       <!-- Admin-specific logout -->
-       <div class="text-right mb-4">
-        <a href="{{ url_for('cpanel.admin_logout') }}" class="btn btn-danger">Logout</a>
-    </div>
-
-    <!-- Flash messages for success, error, etc. -->
+    <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <div class="alert-container">
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissable fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+    {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
         {% endfor %}
-        {% endif %}
+    {% endif %}
     {% endwith %}
 
     <!-- Tabs for navigation -->
     <ul class="nav nav-tabs" id="adminTabs" role="tablist">
-        <li class="nav-item">
-            <a class="nav-link active" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="products-tab" data-toggle="tab" href="#products" role="tab" aria-controls="products" aria-selected="false">Products</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="bills-tab" data-toggle="tab" href="#bills" role="tab" aria-controls="bills" aria-selected="false">Bills</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="inventory-tab" data-toggle="tab" href="#inventory" role="tab" aria-controls="inventory" aria-selected="false">Inventory</a>
-        </li>
+        <li class="nav-item"><a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab">Users</a></li>
+        <li class="nav-item"><a class="nav-link" id="products-tab" data-bs-toggle="tab" href="#products" role="tab">Products</a></li>
+        <li class="nav-item"><a class="nav-link" id="bills-tab" data-bs-toggle="tab" href="#bills" role="tab">Bills</a></li>
+        <li class="nav-item"><a class="nav-link" id="inventory-tab" data-bs-toggle="tab" href="#inventory" role="tab">Inventory</a></li>
+        <li class="nav-item"><a class="nav-link" id="hst-tab" data-bs-toggle="tab" href="#hst" role="tab">HST</a></li>
+        <li class="nav-item"><a class="nav-link" id="compagny-info" data-bs-toggle="tab" href="#company-info" role="tab">Company Information</a></li>
     </ul>
 
     <!-- Tab Content -->
     <div class="tab-content mt-3" id="adminTabsContent">
-        <!-- Users Tab Content -->
-        <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
+
+        <!-- Users Tab -->
+        <div class="tab-pane fade show active" id="users" role="tabpanel">
             <h2>Manage Users</h2>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone Number</th>
-                        <th>Created At</th>
-                        <th>Updated At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    <tr>
-                        <td>{{ user.first_name }} {{ user.last_name }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.phone_number }}</td>
-                        <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        <td>{{ user.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
-                        <td>
-                            <a href="{{ url_for('cpanel.edit_user', user_id=user.id) }}" class="btn btn-sm btn-primary">Edit</a>
-                            <form action="{{ url_for('cpanel.delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="6">No users found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="table-responsive">  <!-- ✅ Responsive table -->
+                <table class="table table-striped w-100">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone Number</th>
+                            <th>Created At</th>
+                            <th>Updated At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.first_name }} {{ user.last_name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.phone_number }}</td>
+                            <td>{{ user.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>{{ user.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>
+                                <a href="{{ url_for('cpanel.edit_user', user_id=user.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                <form action="{{ url_for('cpanel.delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="6">No users found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        <!-- Products Tab Content -->
-        <div class="tab-pane fade" id="products" role="tabpanel" aria-labelledby="products-tab">
+        <!-- Products Tab -->
+        <div class="tab-pane fade" id="products" role="tabpanel">
             <h2>Manage Products</h2>
             <a href="{{ url_for('cpanel.add_product') }}" class="btn btn-success mb-3">Add New Product</a>
-            <table class="table table-striped">
-                <thead>
+            
+            <table class="table table-striped w-100">
+                <thead class="table-dark">
                     <tr>
                         <th>Image</th>
                         <th>Name</th>
@@ -108,7 +89,8 @@
                     <tr>
                         <td>
                             {% if product.image_data %}
-                                <img src="data:image/jpeg;base64,{{ product.image_data | b64encode }}" alt="{{ product.name }}" class="img-fluid" style="max-height: 100px;">
+                                <img src="data:image/jpeg;base64,{{ product.image_data }}" alt="{{ product.name }}" 
+                                     class="img-fluid" style="max-height: 80px;">
                             {% else %}
                                 <span>No image available</span>
                             {% endif %}
@@ -127,77 +109,118 @@
                         </td>
                     </tr>
                     {% else %}
-                    <tr>
-                        <td colspan="8">No products found.</td>
-                    </tr>
+                    <tr><td colspan="8">No products found.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <!-- Bills Tab Content -->
-        <div class="tab-pane fade" id="bills" role="tabpanel" aria-labelledby="bills-tab">
+        <!-- Bills Tab -->
+        <div class="tab-pane fade" id="bills" role="tabpanel">
             <h2>Manage Bills</h2>
-            <table class="table table-striped">
-                <thead>
+            <div class="table-responsive">
+                <table class="table table-striped w-100">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Customer</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bill in bills %}
+                        <tr>
+                            <td>{{ bill.customer_name }}</td>
+                            <td>${{ "%.2f"|format(bill.total) }}</td>
+                            <td>
+                                <a href="{{ url_for('cpanel.edit_bill', bill_id=bill.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                <form action="{{ url_for('cpanel.delete_bill', bill_id=bill.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="3">No bills found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ✅ HST Tab -->
+        <div class="tab-pane fade" id="hst" role="tabpanel">
+            <h2>Manage HST Rates</h2>
+            <a href="{{ url_for('cpanel.add_hst') }}" class="btn btn-success mb-3">Add New HST</a>
+            
+            <table class="table table-striped w-100">
+                <thead class="table-dark">
                     <tr>
-                        <th>Customer</th>
-                        <th>Total</th>
+                        <th>Province</th>
+                        <th>HST Rate (%)</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for bill in bills %}
+                    {% for hst in hst_rates %}
                     <tr>
-                        <td>{{ bill.customer_name }}</td>
-                        <td>${{ "%.2f"|format(bill.total) }}</td>
+                        <td>{{ hst.province }}</td>
+                        <td>%{{ hst.hst_value }}%</td>
                         <td>
-                            <a href="{{ url_for('cpanel.edit_bill', bill_id=bill.id) }}" class="btn btn-sm btn-primary">Edit</a>
-                            <form action="{{ url_for('cpanel.delete_bill', bill_id=bill.id) }}" method="POST" style="display:inline;">
+                            <a href="{{ url_for('cpanel.edit_hst', hst_id=hst.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                            <form action="{{ url_for('cpanel.delete_hst', hst_id=hst.id) }}" method="POST" style="display:inline;">
                                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                             </form>
                         </td>
                     </tr>
                     {% else %}
-                    <tr>
-                        <td colspan="3">No bills found.</td>
-                    </tr>
+                    <tr><td colspan="3">No HST rates found.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <!-- Inventory Tab Content -->
-        <div class="tab-pane fade" id="inventory" role="tabpanel" aria-labelledby="inventory-tab">
-            <h2>Manage Inventory</h2>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Stock</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in inventory %}
-                    <tr>
-                        <td>{{ item.name }}</td>
-                        <td>{{ item.stock }}</td>
-                        <td>
-                            <a href="{{ url_for('cpanel.edit_inventory', inventory_id=item.id) }}" class="btn btn-sm btn-primary">Edit</a>
-                            <form action="{{ url_for('cpanel.delete_inventory', inventory_id=item.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="3">No inventory items found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="tab-pane fade" id="company-info" role="tabpanel">
+            <h2 class="fw-bold">Company Information</h2>
+            <div class="table-responsive">
+                <table class="table table-striped w-100">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Website</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if company_info %}
+                        <tr>
+                            <td>{{ company_info.name }}</td>
+                            <td>{{ company_info.email }}</td>
+                            <td>{{ company_info.phone }}</td>
+                            <td>{{ company_info.address }}</td>
+                            <td>
+                                {% if company_info.website %}
+                                <a href="{{ company_info.website }}" target="_blank">{{ company_info.website }}</a>
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ url_for('cpanel.edit_company_info') }}" class="btn btn-sm btn-primary">Edit</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">No company information available.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+        
     </div>
 </div>
 {% endblock %}

@@ -1,36 +1,81 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="text-center mb-4">Your Cart</h2>
+<div class="container-fluid mt-5 px-5">  <!-- ✅ More width, reduced side space -->
+    <h2 class="text-center mb-4">Shopping Cart</h2>
 
-    {% if cart %}
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in cart %}
-                    <tr>
-                        <td>{{ item.name }}</td>
-                        <td>${{ item.price }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <p class="text-right font-weight-bold">Total: ${{ total }}</p>
-        <div class="text-center">
-            <form method="post" action="{{ url_for('checkout') }}">
-                <button type="submit" class="btn btn-success btn-lg">Proceed to Checkout</button>
-            </form>
-        </div>
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {% if products %}
+    <div class="table-responsive">
+        <table class="table table-striped w-100">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col" style="width: 15%;">Image</th>
+                    <th scope="col" style="width: 25%;">Product Name</th>
+                    <th scope="col" style="width: 15%;">Unit Price</th>
+                    <th scope="col" style="width: 15%;">Quantity</th>
+                    <th scope="col" style="width: 15%;">Subtotal</th>
+                    <th scope="col" style="width: 15%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>
+                        {% if product.image_data %}
+                        <img src="data:image/jpeg;base64,{{ product.image_data }}" alt="{{ product.name }}" 
+                             style="max-width: 120px; max-height: 120px; object-fit: contain;">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='no-image.png') }}" alt="No image available" 
+                             style="max-width: 120px; max-height: 120px; object-fit: contain;">
+                        {% endif %}
+                    </td>
+                    <td>{{ product.name }}</td>
+                    <td>${{ "%.2f"|format(product.unit_price) }}</td>
+                    
+                    <td>
+                        <form method="POST" action="{{ url_for('views.update_quantity', product_id=product.id) }}" class="d-flex align-items-center">
+                            <input type="number" name="quantity" value="{{ product.quantity }}" min="1" 
+                                   class="form-control text-center me-2" style="width: 70px;">
+                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                        </form>
+                    </td>
+
+                    <td>${{ "%.2f"|format(product.unit_price * product.quantity) }}</td>
+                    
+                    <td>
+                        <form method="POST" action="{{ url_for('views.remove_from_cart', product_id=product.id) }}" 
+                              onsubmit="return confirm('Are you sure you want to remove this item?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="text-end mt-4">
+        <h4>Total: ${{ "%.2f"|format(total_price) }}</h4>
+        <form action="{{ url_for('views.checkout') }}" method="POST">
+            <input type="hidden" name="total_price" value="{{ total_price }}">
+            <button type="submit" class="btn btn-success btn-lg">Proceed to Checkout</button>
+        </form>
+    </div>
+    
     {% else %}
-        <p class="text-center">Your cart is empty.</p>
+    <p class="text-center mt-4">Your cart is empty.</p>
     {% endif %}
 </div>
 {% endblock %}

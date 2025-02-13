@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>{{ action }} HST Rate</h2>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="province" class="form-label">Province</label>
+            <input
+                type="text"
+                class="form-control"
+                id="province"
+                name="province"
+                value="{{ hst.province if hst else '' }}"
+            >     
+        </div>
+        <div class="mb-3">
+            <label for="hst_value" class="form-label">HST Rate (%)</label>
+            <input
+                type="number"
+                class="form-control"
+                id="hst_value"
+                name="rate"
+                step="0.01"
+                value="{{ hst.hst_value if hst else '' }}"
+            >
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>  <!-- Updated button text -->
+        <a href="{{ url_for('cpanel.cpanel_admin') + '#hst' }}" class="btn btn-secondary">Cancel</a>
+    </form>    
+</div>
+{% endblock %}
