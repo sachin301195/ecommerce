@@ -46,6 +46,16 @@
         </div>
 
         <div class="form-group">
+            <label for="categories"><strong>Product Categories</strong></label>
+            <input type="text" class="form-control" id="categories" name="categories" value="{{ product.categories or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="description"><strong>Product Description</strong></label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ product.description or '' }}</textarea>
+        </div>        
+
+        <div class="form-group">
             <label for="reference"><strong>Product Reference</strong></label>
             <input type="text" class="form-control" id="reference" name="reference" value="{{ product.reference }}" required>
         </div>
@@ -53,12 +63,27 @@
         <div class="form-group">
             <label for="image"><strong>Product Image</strong></label>
             <input type="file" class="form-control-file" id="image" name="image" accept="image/*">
-            {% if product.image %}
+            <input type="hidden" id="image_base64" name="image_base64"> <!-- Hidden field for Base64 -->
+        
+            {% if product.image_data %}
             <p class="mt-2">Current Image:</p>
-            <img src="data:image/jpeg;base64,{{ product.image | b64encode }}" alt="{{ product.name }}" class="img-fluid" style="max-height: 150px;">
+            <img src="data:image/jpeg;base64,{{ product.image_data | b64encode }}" 
+                 alt="{{ product.name }}" class="img-fluid" style="max-height: 150px;">
             {% endif %}
         </div>
-
+        
+        <script>
+        document.getElementById("image").addEventListener("change", function(event) {
+            let file = event.target.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onloadend = function() {
+                    document.getElementById("image_base64").value = reader.result.split(",")[1]; // Store only Base64 part
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        </script>
         <button type="submit" class="btn btn-primary">Update Product</button>
         <a href="{{ url_for('cpanel.cpanel_admin') }}#products" class="btn btn-secondary">Cancel</a>
     </form>

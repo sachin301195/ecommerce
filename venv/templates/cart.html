@@ -22,10 +22,11 @@
             <thead class="table-dark">
                 <tr>
                     <th scope="col" style="width: 15%;">Image</th>
-                    <th scope="col" style="width: 25%;">Product Name</th>
-                    <th scope="col" style="width: 15%;">Unit Price</th>
-                    <th scope="col" style="width: 15%;">Quantity</th>
+                    <th scope="col" style="width: 20%;">Product Name</th>
+                    <th scope="col" style="width: 10%;">Unit Price</th>
+                    <th scope="col" style="width: 10%;">Quantity</th>
                     <th scope="col" style="width: 15%;">Subtotal</th>
+                    <th scope="col" style="width: 10%;">HST</th> <!-- ✅ New HST Column -->
                     <th scope="col" style="width: 15%;">Actions</th>
                 </tr>
             </thead>
@@ -34,7 +35,7 @@
                 <tr>
                     <td>
                         {% if product.image_data %}
-                        <img src="data:image/jpeg;base64,{{ product.image_data }}" alt="{{ product.name }}" 
+                        <img src="data:image/jpeg;base64,{{ product.image_base64 }}" alt="{{ product.name }}"
                              style="max-width: 120px; max-height: 120px; object-fit: contain;">
                         {% else %}
                         <img src="{{ url_for('static', filename='no-image.png') }}" alt="No image available" 
@@ -54,6 +55,8 @@
 
                     <td>${{ "%.2f"|format(product.unit_price * product.quantity) }}</td>
                     
+                    <td>${{ "%.2f"|format((product.unit_price * product.quantity) * (hst_amount / subtotal) if subtotal > 0 else 0) }}</td>  <!-- ✅ HST per product -->
+
                     <td>
                         <form method="POST" action="{{ url_for('views.remove_from_cart', product_id=product.id) }}" 
                               onsubmit="return confirm('Are you sure you want to remove this item?');">
@@ -67,7 +70,9 @@
     </div>
 
     <div class="text-end mt-4">
-        <h4>Total: ${{ "%.2f"|format(total_price) }}</h4>
+        <h4>Subtotal: ${{ "%.2f"|format(subtotal) }}</h4>
+        <h4>HST: ${{ "%.2f"|format(hst_amount) }}</h4>  <!-- ✅ Display HST separately -->
+        <h4><strong>Total: ${{ "%.2f"|format(total_price) }}</strong></h4>
         <form action="{{ url_for('views.checkout') }}" method="POST">
             <input type="hidden" name="total_price" value="{{ total_price }}">
             <button type="submit" class="btn btn-success btn-lg">Proceed to Checkout</button>

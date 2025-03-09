@@ -19,7 +19,6 @@
     <ul class="nav nav-tabs" id="adminTabs" role="tablist">
         <li class="nav-item"><a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab">Users</a></li>
         <li class="nav-item"><a class="nav-link" id="products-tab" data-bs-toggle="tab" href="#products" role="tab">Products</a></li>
-        <li class="nav-item"><a class="nav-link" id="bills-tab" data-bs-toggle="tab" href="#bills" role="tab">Bills</a></li>
         <li class="nav-item"><a class="nav-link" id="inventory-tab" data-bs-toggle="tab" href="#inventory" role="tab">Inventory</a></li>
         <li class="nav-item"><a class="nav-link" id="hst-tab" data-bs-toggle="tab" href="#hst" role="tab">HST</a></li>
         <li class="nav-item"><a class="nav-link" id="compagny-info" data-bs-toggle="tab" href="#company-info" role="tab">Company Information</a></li>
@@ -114,38 +113,121 @@
                 </tbody>
             </table>
         </div>
+       <!-- Inventory Main Tab -->
+<div class="tab-pane fade" id="inventory" role="tabpanel">
 
-        <!-- Bills Tab -->
-        <div class="tab-pane fade" id="bills" role="tabpanel">
-            <h2>Manage Bills</h2>
-            <div class="table-responsive">
-                <table class="table table-striped w-100">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Customer</th>
-                            <th>Total</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for bill in bills %}
-                        <tr>
-                            <td>{{ bill.customer_name }}</td>
-                            <td>${{ "%.2f"|format(bill.total) }}</td>
-                            <td>
-                                <a href="{{ url_for('cpanel.edit_bill', bill_id=bill.id) }}" class="btn btn-sm btn-primary">Edit</a>
-                                <form action="{{ url_for('cpanel.delete_bill', bill_id=bill.id) }}" method="POST" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                        {% else %}
-                        <tr><td colspan="3">No bills found.</td></tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <!-- Sub-Tabs for Inventory IN, OUT, and Current -->
+    <ul class="nav nav-pills mb-3" id="inventoryTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="inventory-in-tab" data-bs-toggle="tab" href="#inventory-in" role="tab">Inventory IN</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="inventory-out-tab" data-bs-toggle="tab" href="#inventory-out" role="tab">Inventory OUT</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="current-inventory-tab" data-bs-toggle="tab" href="#current-inventory" role="tab">Current Inventory</a>
+        </li>
+    </ul>
+
+    <!-- Sub-Tab Content -->
+    <div class="tab-content" id="inventoryTabsContent">
+        
+        <!-- Inventory IN Tab -->
+        <div class="tab-pane fade show active" id="inventory-in" role="tabpanel">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total Amount</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in inventory_in %}
+                    <tr>
+                        <td>{{ record.Transaction_ID }}</td>
+                        <td>{{ record.Date }}</td>
+                        <td>{{ record.product.name }}</td>
+                        <td>{{ record.QTE }}</td>
+                        <td>${{ "%.2f"|format(record.Price) }}</td>
+                        <td>${{ "%.2f"|format(record.Total_Amount) }}</td>
+                        <td>{{ record.Created_At.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ record.Updated_At.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="8">No inventory IN records found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
+
+        <!-- Inventory OUT Tab -->
+        <div class="tab-pane fade" id="inventory-out" role="tabpanel">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Date</th>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Total Amount</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in inventory_out %}
+                    <tr>
+                        <td>{{ record.Transaction_ID }}</td>
+                        <td>{{ record.Date }}</td>
+                        <td>{{ record.product.name }}</td>
+                        <td>{{ record.QTE }}</td>
+                        <td>${{ "%.2f"|format(record.Total_Amount) }}</td>
+                        <td>{{ record.Created_At.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ record.Updated_At.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7">No inventory OUT records found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Current Inventory Tab -->
+        <div class="tab-pane fade" id="current-inventory" role="tabpanel">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Product</th>
+                        <th>Total Quantity IN</th>
+                        <th>Total Quantity OUT</th>
+                        <th>Current Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in current_inventory %}
+                    <tr>
+                        <td>{{ record.product_name }}</td>
+                        <td>{{ record.total_in }}</td>
+                        <td>{{ record.total_out }}</td>
+                        <td>{{ record.current_stock }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4">No inventory data available.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
 
         <!-- ✅ HST Tab -->
         <div class="tab-pane fade" id="hst" role="tabpanel">

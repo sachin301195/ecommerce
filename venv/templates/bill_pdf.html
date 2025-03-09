@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice #{{ bill.Billing_ID }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        .invoice-container {
+            width: 100%;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .column {
+            width: 48%;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table, .table th, .table td {
+            border: 1px solid black;
+        }
+        .table th, .table td {
+            padding: 10px;
+            text-align: center;
+        }
+        .table th {
+            background-color: #333;
+            color: white;
+        }
+        .total-table {
+            width: 100%;
+            margin-top: 20px;
+            text-align: right;
+        }
+        .total-table td {
+            padding: 8px;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #f8f8f8;
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <!-- Invoice Header -->
+        <h2>Invoice #{{ bill.Billing_ID }}</h2>
+
+        <div class="row">
+            <!-- Company Info -->
+            <div class="column">
+                <h4>Company Information</h4>
+                <p><strong>{{ company.name }}</strong></p>
+                <p>{{ company.address }}</p>
+                <p>Email: {{ company.email }}</p>
+                <p>Phone: {{ company.phone }}</p>
+            </div>
+
+            <!-- Client Info -->
+            <div class="column" style="text-align: right;">
+                <h4>Client Information</h4>
+                <p><strong>{{ client.first_name }} {{ client.last_name }}</strong></p>
+                <p>{{ client.address }}</p>
+                <p>{{ client.city }}, {{ client.province }} {{ client.postal_code }}</p>
+                <p>{{ client.country }}</p>
+                <p>Email: {{ client.email }}</p>
+                <p>Phone: {{ client.phone_number }}</p>
+            </div>
+        </div>
+
+        <!-- Invoice Date -->
+        <hr>
+        <p><strong>Date:</strong> {{ bill.Date.strftime('%Y-%m-%d') }}</p>
+
+        <!-- Products Purchased -->
+        <h4>Products Purchased</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Unit Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in bill.details %}
+                <tr>
+                    <td>{{ detail.product.name if detail.product else 'Unknown Product' }}</td>
+                    <td>${{ "%.2f"|format(detail.Price) }}</td>
+                    <td>{{ detail.Quantity }}</td>
+                    <td>${{ "%.2f"|format(detail.Price * detail.Quantity) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Total Calculation -->
+        <table class="total-table">
+            <tr>
+                <td><strong>Total Before Tax:</strong></td>
+                <td>${{ "%.2f"|format(bill.Total_BT) }}</td>
+            </tr>
+            <tr>
+                <td><strong>HST:</strong></td>
+                <td>${{ "%.2f"|format(bill.Total_HST) }}</td>
+            </tr>
+            <tr class="total-row">
+                <td><strong>Total Amount:</strong></td>
+                <td><strong>${{ "%.2f"|format(bill.Total_Net) }}</strong></td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

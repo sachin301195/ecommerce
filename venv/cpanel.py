@@ -1,6 +1,8 @@
 from flask import Flask, render_template, redirect, url_for, flash, Blueprint, request, session
-from .models import User, HST, Product, AuthenticationAdmin, CompanyInfo
+from .models import User, HST, Product, AuthenticationAdmin, CompanyInfo, BillDetails, Billing, Inventory_IN, Inventory_OUT
 from . import db
+from datetime import datetime,timezone
+from sqlalchemy import func
 from flask_login import login_user, current_user, login_required, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import base64
@@ -25,6 +27,8 @@ def admin_login():
 
     return render_template('admin_login.html')
 
+def save_image(base64_string):
+    return base64.b64decode(base64_string)  # Convert Base64 to binary before saving
 
 # Admin Logout
 @cpanel.route('/cpanel/logout')
@@ -51,15 +55,30 @@ def cpanel_admin():
     # Fetch data for the admin dashboard
     users = User.query.all()  # Fetch all users
     hst_rates = HST.query.all()  # ✅ Fetch HST rates
+    bills = db.session.query(Billing).join(User, Billing.Client_ID == User.id).all()
+    #bill_details = BillDetails.query.all()  # Fetch all bill details
     products = Product.query.all()  # Fetch all products
+    inventory_in = Inventory_IN.query.all()  # Fetch inventory records
+    inventory_out = Inventory_OUT.query.all()  # Fetch Inventory OUT records
     company_info = CompanyInfo.query.first()
+    
+     # Calculate current inventory
+    current_inventory = db.session.query(
+    Product.name.label("product_name"),
+    func.coalesce(func.sum(Inventory_IN.QTE), 0).label("total_in"),
+    func.coalesce(func.sum(Inventory_OUT.QTE), 0).label("total_out"),
+    (func.coalesce(func.sum(Inventory_IN.QTE), 0) - func.coalesce(func.sum(Inventory_OUT.QTE), 0)).label("current_stock")
+).outerjoin(Inventory_IN, Product.id == Inventory_IN.Product_ID) \
+ .outerjoin(Inventory_OUT, Product.id == Inventory_OUT.Product_ID) \
+ .group_by(Product.id).all()
     
      # ✅ Ensure product images are base64 encoded
     for product in products:
         if product.image_data and not isinstance(product.image_data, str):  
             product.image_data = base64.b64encode(product.image_data).decode('utf-8')
     
-    return render_template("cpanel.html", users=users, user={'is_authenticated': session.get('admin_authenticated')}, hst_rates=hst_rates, products=products, company_info=company_info)
+    return render_template("cpanel.html", users=users, user={'is_authenticated': session.get('admin_authenticated')}, hst_rates=hst_rates, products=products, bills=bills, company_info=company_info, inventory_in=inventory_in, 
+        inventory_out=inventory_out, current_inventory=current_inventory )
 
 # Add Product
 @cpanel.route('/cpanel/products/add', methods=['GET', 'POST'])
@@ -77,10 +96,21 @@ def add_product():
         reference = request.form.get('reference')
         categories = request.form.get('categories')
         description = request.form.get('description')
-        
+
         # Handle image upload
-        image = request.files.get('image')
-        image_data = image.read() if image else None
+        image_file = request.files.get('image')  # Get image file
+        base64_image = request.form.get("image_base64")  # Get Base64 image
+
+        image_data = None
+        if image_file and image_file.filename:
+            image_data = image_file.read()  # ✅ Store as binary data
+        elif base64_image:
+            try:
+                image_data = base64.b64decode(base64_image)  # ✅ Convert Base64 to binary
+            except Exception as e:
+                print(f"Error decoding image: {e}")
+                flash("Invalid image format", "danger")
+                return redirect(request.referrer)
 
         # Add the product to the database
         new_product = Product(
@@ -96,6 +126,19 @@ def add_product():
         )
         db.session.add(new_product)
         db.session.commit()
+        
+         # Add an entry to the Inventory_IN table
+        new_inventory_entry = Inventory_IN(
+            Date=datetime.now(timezone.utc).date(),
+            QTE=qte_max,  # Initial stock quantity
+            Price=unit_price,
+            Total_Amount=qte_max * unit_price,  # Initial total amount
+            Product_ID=new_product.id,
+            Created_At=datetime.now(timezone.utc),
+            Updated_At=datetime.now(timezone.utc)
+        )
+        db.session.add(new_inventory_entry)
+        db.session.commit()
 
         flash('Product added successfully!', 'success')
         return redirect(url_for('cpanel.cpanel_admin') + '#products')
@@ -105,24 +148,62 @@ def add_product():
 # Edit and Delete Products (as implemented in your code)
 @cpanel.route('/cpanel/products/edit/<int:product_id>', methods=['GET', 'POST'])
 def edit_product(product_id):
-    
     if not session.get('admin_authenticated'):
         flash('You must be logged in as an admin to access this page.', 'danger')
         return redirect(url_for('cpanel.admin_login'))
     
     product = Product.query.get_or_404(product_id)
-    if request.method == 'POST':
-        product.name = request.form['name']
-        product.unit_price = float(request.form['unit_price'])
-        product.qte_max = int(request.form['qte_max'])
-        product.qte_refill = int(request.form['qte_refill'])
-        product.qte_alert = int(request.form['qte_alert'])
-        product.reference = request.form['reference']
 
-        # Handle optional image update
-        image_file = request.files['image']
-        if image_file:
-            product.image = image_file.read()  # Update binary image data
+    if request.method == 'POST':
+        print(request.form)  # ✅ Debugging: Check for missing fields
+
+        # Store old quantity before updating
+        old_qte_max = product.qte_max  
+
+        # Update product fields
+        product.name = request.form.get('name', product.name)
+        product.unit_price = float(request.form.get('unit_price', product.unit_price))
+        product.qte_max = int(request.form.get('qte_max', product.qte_max))
+        product.qte_refill = int(request.form.get('qte_refill', product.qte_refill))
+        product.qte_alert = int(request.form.get('qte_alert', product.qte_alert))
+        product.reference = request.form.get('reference', product.reference)
+        product.categories = request.form.get('categories', product.categories)
+        product.description = request.form.get('description', product.description)
+
+        # Handle image upload (binary file or Base64)
+        image_file = request.files.get('image')
+        base64_image = request.form.get('image_base64')
+
+        if image_file and image_file.filename:
+            product.image_data = image_file.read()  # ✅ Store binary data
+
+        elif base64_image:  
+            try:
+                product.image_data = base64.b64decode(base64_image)  # ✅ Convert Base64 to bytes
+            except Exception as e:
+                print(f"Error decoding Base64 image: {e}")  # Debugging
+                flash("Invalid image format", "danger")
+                return redirect(request.referrer)
+
+         # ✅ Check if quantity has changed
+        if product.qte_max != old_qte_max:
+            inventory_entry = Inventory_IN.query.filter_by(Product_ID=product.id).first()
+            
+            if inventory_entry:  # If the product already exists in Inventory_IN, update it
+                inventory_entry.QTE = product.qte_max
+                inventory_entry.Total_Amount = product.qte_max * product.unit_price
+                inventory_entry.Updated_At = datetime.now(timezone.utc)
+            else:  # If no existing inventory entry, create a new one
+                inventory_entry = Inventory_IN(
+                    Date=datetime.now(timezone.utc).date(),
+                    QTE=product.qte_max,
+                    Price=product.unit_price,
+                    Total_Amount=product.qte_max * product.unit_price,
+                    Product_ID=product.id,
+                    Created_At=datetime.now(timezone.utc),
+                    Updated_At=datetime.now(timezone.utc)
+                )
+                db.session.add(inventory_entry)
 
         db.session.commit()
         flash('Product updated successfully!', 'success')
@@ -138,15 +219,22 @@ def delete_product(product_id):
         return redirect(url_for('cpanel.admin_login'))
     
     product = Product.query.get_or_404(product_id)
+    
     try:
-        db.session.delete(product)
+        # ✅ Delete all related Inventory_IN records before deleting the product
+        Inventory_IN.query.filter_by(Product_ID=product.id).delete()
+
+        db.session.delete(product)  # ✅ Now delete the product
         db.session.commit()
-        flash('Product deleted successfully!', 'success')
+
+        flash('Product and related inventory records deleted successfully!', 'success')
+    
     except Exception as e:
         db.session.rollback()
         flash(f'Error deleting product: {str(e)}', 'error')
 
     return redirect(url_for('cpanel.cpanel_admin') + '#products')
+
 
 # CRUD for Users (already implemented)
 

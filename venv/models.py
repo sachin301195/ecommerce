@@ -54,3 +54,68 @@ class CompanyInfo(db.Model):
     address = db.Column(db.String(255), nullable=False)
     website = db.Column(db.String(255), nullable=True)
     
+class Billing(db.Model):
+    __tablename__ = 'billing'
+    
+    Billing_ID = db.Column(db.Integer, primary_key=True)
+    Date = db.Column(db.Date, default=datetime.now(timezone.utc))
+    Quantity = db.Column(db.Integer, nullable=False)
+    Total_BT = db.Column(db.Float, nullable=False)  # Before Tax
+    Total_HST = db.Column(db.Float, nullable=False)  # Tax
+    Total_Net = db.Column(db.Float, nullable=False)  # Total after tax
+    Client_ID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    Observations = db.Column(db.String(255), nullable=True)
+    HST_ID = db.Column(db.Integer, db.ForeignKey('hst.id'), nullable=True)
+    Created_At = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    Updated_At = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+
+    details = db.relationship('BillDetails', backref='billing', lazy='dynamic')
+      # ✅ Add a relationship to the User model
+    client = db.relationship('User', backref='bills', lazy=True)
+
+
+class BillDetails(db.Model):
+    __tablename__ = 'bill_details'
+    
+    Bill_Details_ID = db.Column(db.Integer, primary_key=True)
+    Billing_ID = db.Column(db.Integer, db.ForeignKey('billing.Billing_ID'), nullable=False)
+    Price = db.Column(db.Float, nullable=False)
+    Quantity = db.Column(db.Integer, nullable=False, default=1)
+    Product_ID = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    Created_At = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    Updated_At = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+    # Relationship with Product
+    product = db.relationship('Product', backref='bill_details')
+    
+
+class Inventory_IN(db.Model):
+    __tablename__ = 'inventory_IN'  # Renamed Table
+
+    Transaction_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Date = db.Column(db.Date, nullable=False)
+    QTE = db.Column(db.Integer, nullable=False)  # Quantity
+    Price = db.Column(db.Float, nullable=False)
+    Total_Amount = db.Column(db.Float, nullable=False)
+    Product_ID = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    Created_At = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    Updated_At = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+
+    product = db.relationship('Product', backref=db.backref('inventory_IN', lazy=True))
+    
+    
+class Inventory_OUT(db.Model):
+    __tablename__ = 'inventory_OUT'  # Table Name
+
+    Transaction_ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Date = db.Column(db.Date, nullable=False)
+    QTE = db.Column(db.Integer, nullable=False)  # Quantity
+    Total_Amount = db.Column(db.Float, nullable=False)
+    Product_ID = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    Created_At = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    Updated_At = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+
+    product = db.relationship('Product', backref=db.backref('inventory_OUT', lazy=True))
+
+    
+
+    

@@ -118,6 +118,33 @@ def profile():
     # GET request: Display the current user's information in the form
     return render_template('profile.html', user=user)
 
+@auth.route('/update-password', methods=['POST'])
+@login_required
+def update_password():
+    """Handles user password updates separately from profile info."""
+    current_password = request.form.get('current_password')
+    new_password = request.form.get('new_password')
+    confirm_password = request.form.get('confirm_password')
+
+    if not check_password_hash(current_user.password, current_password):
+        flash('Incorrect current password.', 'error')
+        return redirect(url_for('auth.profile'))
+
+    if new_password != confirm_password:
+        flash('New passwords do not match.', 'error')
+        return redirect(url_for('auth.profile'))
+
+    if len(new_password) < 7:
+        flash('New password must be at least 7 characters.', 'error')
+        return redirect(url_for('auth.profile'))
+
+    # Update password
+    current_user.password = generate_password_hash(new_password, method='pbkdf2:sha256')
+    db.session.commit()
+    
+    flash('Password updated successfully!', 'success')
+    return redirect(url_for('auth.profile'))
+
         
     
 

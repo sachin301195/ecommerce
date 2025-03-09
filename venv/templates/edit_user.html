@@ -1,47 +1,88 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>Edit User</h1>
-    <form method="POST" action="{{ url_for('cpanel.edit_user', user_id=user.id) }}">
-        <div class="form-group">
-            <label for="first_name">First Name</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+<div class="container-fluid mt-5 px-5"> <!-- ✅ Full width container -->
+    <h1 class="text-center mb-4">Edit User</h1>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10"> <!-- ✅ Wider column -->
+            <div class="card p-4 shadow">
+                <h4 class="mb-3">User Details</h4>
+                <form method="POST" action="{{ url_for('cpanel.edit_user', user_id=user.id) }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="phone_number" class="form-label">Phone Number</label>
+                            <input type="text" class="form-control" name="phone_number" value="{{ user.phone_number }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="address" class="form-label">Address</label>
+                            <input type="text" class="form-control" name="address" value="{{ user.address }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="postal_code" class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" name="postal_code" value="{{ user.postal_code }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" name="city" value="{{ user.city }}">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="province" class="form-label">Province</label>
+                            <input type="text" class="form-control" name="province" value="{{ user.province }}">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="country" class="form-label">Country</label>
+                            <input type="text" class="form-control" name="country" value="{{ user.country }}">
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+                        <a href="{{ url_for('cpanel.cpanel_admin') }}" class="btn btn-secondary px-4">Cancel</a>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="last_name">Last Name</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
-        </div>
-        <div class="form-group">
-            <label for="phone_number">Phone Number</label>
-            <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ user.phone_number }}" required>
-        </div>
-        <div class="form-group">
-            <label for="address">Address</label>
-            <input type="text" class="form-control" id="address" name="address" value="{{ user.address }}">
-        </div>
-        <div class="form-group">
-            <label for="postal_code">Postal Code</label>
-            <input type="text" class="form-control" id="postal_code" name="postal_code" value="{{ user.postal_code }}">
-        </div>
-        <div class="form-group">
-            <label for="city">City</label>
-            <input type="text" class="form-control" id="city" name="city" value="{{ user.city }}">
-        </div>
-        <div class="form-group">
-            <label for="province">Province</label>
-            <input type="text" class="form-control" id="province" name="province" value="{{ user.province }}">
-        </div>
-        <div class="form-group">
-            <label for="country">Country</label>
-            <input type="text" class="form-control" id="country" name="country" value="{{ user.country }}">
-        </div>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="{{ url_for('cpanel.cpanel_admin') }}" class="btn btn-secondary">Cancel</a>
-    </form>
+    </div>
 </div>
+
+<style>
+    .card {
+        border-radius: 10px;
+    }
+
+    .form-control {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    .btn {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+</style>
 {% endblock %}
