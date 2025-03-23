@@ -5,11 +5,23 @@
 {% block content %}
 <div class="container" style="max-width: 500px; margin-top: 50px;">
     <h3 class="text-center mb-5"><b>Login to Your Account</b></h3>
-    <!-- Added more space below the heading -->
-    <div class="mb-4"></div> <!-- This increases the space -->
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <form method="POST">
         <div class="row justify-content-center">
-            <!-- Left Column: Email, Password, Submit Button -->
             <div class="col-12">
                 <div class="form-group">
                     <label for="email">Email Address</label>
@@ -19,8 +31,6 @@
                     <label for="password">Password</label>
                     <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required />
                 </div>
-                
-                <!-- Submit button below the password field, centered -->
                 <button type="submit" class="btn btn-primary btn-block btn-lg mt-3">Login</button>
             </div>
         </div>

@@ -1,8 +1,9 @@
 from flask import Flask, Blueprint, render_template, request, session, redirect, url_for, flash, jsonify
 from flask_login import login_required, current_user
-from .models import User, Product, HST, Billing, BillDetails, CompanyInfo, Inventory_OUT
+from .models import User, Product, HST, Billing, BillDetails, CompanyInfo, Inventory_OUT, Inventory_IN
 from . import db
 import base64, stripe
+from sqlalchemy import func
 import pdfkit
 from datetime import datetime,timezone
 import io
@@ -94,6 +95,16 @@ def view_cart():
 def add_to_cart(product_id):
     """Add a product to the shopping cart, ensuring the correct data format."""
     product = Product.query.get_or_404(product_id)
+    
+      # Calculate total stock (Inventory_IN - Inventory_OUT)
+    total_in = db.session.query(func.coalesce(func.sum(Inventory_IN.QTE), 0)).filter_by(Product_ID=product.id).scalar()
+    total_out = db.session.query(func.coalesce(func.sum(Inventory_OUT.QTE), 0)).filter_by(Product_ID=product.id).scalar()
+    current_stock = total_in - total_out
+
+    if current_stock <= 0:
+       
+        flash(f"Sorry, '{product.name}' is out of stock.", category='error')
+        return redirect(request.referrer or url_for('views.view_cart'))
 
     if 'cart' not in session or not isinstance(session['cart'], list):
         session['cart'] = []  # Reset cart if corrupted
@@ -131,11 +142,21 @@ def remove_from_cart(product_id):
 def update_quantity(product_id):
     """Update the quantity of a product in the shopping cart."""
     cart = session.get('cart', [])
+    
+     # Calculate available stock for the product
+    total_in = db.session.query(func.coalesce(func.sum(Inventory_IN.QTE), 0)).filter_by(Product_ID=product_id).scalar()
+    total_out = db.session.query(func.coalesce(func.sum(Inventory_OUT.QTE), 0)).filter_by(Product_ID=product_id).scalar()
+    available_stock = total_in - total_out
 
     for item in cart:
         if item['id'] == product_id:
-            new_quantity = int(request.form.get('quantity', 1))
-            item['quantity'] = max(1, new_quantity)  # Ensure at least 1
+            requested_quantity = int(request.form.get('quantity', 1))
+
+            if requested_quantity > available_stock:
+                flash(f"Only {available_stock} unit(s) of this product are available in stock.", 'error')
+                break
+
+            item['quantity'] = max(1, requested_quantity)
             flash(f"Quantity updated to {item['quantity']}.", 'success')
             break
 
@@ -164,6 +185,17 @@ def submit_contact():
 def buy_now(product_id):
     """Add a product to the cart and immediately redirect to the cart."""
     product = Product.query.get_or_404(product_id)
+   
+    # Calculate total stock (Inventory_IN - Inventory_OUT)
+    total_in = db.session.query(func.coalesce(func.sum(Inventory_IN.QTE), 0)).filter_by(Product_ID=product.id).scalar()
+    total_out = db.session.query(func.coalesce(func.sum(Inventory_OUT.QTE), 0)).filter_by(Product_ID=product.id).scalar()
+    current_stock = total_in - total_out
+
+    if current_stock <= 0:
+       
+        flash(f"Sorry, '{product.name}' is out of stock.", category='error')
+        return redirect(request.referrer or url_for('views.view_cart'))
+    
 
     if 'cart' not in session or not isinstance(session['cart'], list):
         session['cart'] = []  # Ensure the cart is a list
@@ -383,9 +415,22 @@ def download_bill(bill_id):
                                bill_details=bill_details, 
                                company=company, 
                                client=client)
+    # ✅ Explicitly set wkhtmltopdf path
+    config = pdfkit.configuration(wkhtmltopdf='/usr/local/bin/wkhtmltopdf')  # or '/usr/bin/wkhtmltopdf'
     
+    options = {
+    'page-size': 'A4',
+    'margin-top': '10mm',
+    'margin-right': '10mm',
+    'margin-bottom': '10mm',
+    'margin-left': '10mm',
+    'encoding': 'UTF-8',
+    'enable-local-file-access': '',
+    'zoom': '0.95',  # ← This is important
+    'viewport-size': '1280x1024',  # ← Forces layout like a large screen
+}
     # Convert HTML to PDF
-    pdf = pdfkit.from_string(rendered, False)
+    pdf = pdfkit.from_string(rendered, False, configuration=config, options = options)
     
     response = send_file(
         io.BytesIO(pdf),

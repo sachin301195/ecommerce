@@ -7,7 +7,7 @@
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
@@ -52,9 +52,6 @@
                             <td>{{ user.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
                             <td>
                                 <a href="{{ url_for('cpanel.edit_user', user_id=user.id) }}" class="btn btn-sm btn-primary">Edit</a>
-                                <form action="{{ url_for('cpanel.delete_user', user_id=user.id) }}" method="POST" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
                             </td>
                         </tr>
                         {% else %}
@@ -102,9 +99,6 @@
                         <td>{{ product.reference }}</td>
                         <td>
                             <a href="{{ url_for('cpanel.edit_product', product_id=product.id) }}" class="btn btn-sm btn-primary">Edit</a>
-                            <form action="{{ url_for('cpanel.delete_product', product_id=product.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
                         </td>
                     </tr>
                     {% else %}

@@ -2,102 +2,116 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice #{{ bill.Billing_ID }}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
+        @page {
+            size: A4;
+            margin: 20mm;
         }
-        .invoice-container {
+
+        html, body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
             width: 100%;
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 10px;
+            overflow-x: hidden;
+            box-sizing: border-box;
         }
+
+        .container {
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
         h2 {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
-        .row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .column {
-            width: 48%;
-        }
-        .table {
+
+        table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+            table-layout: fixed;
+            word-wrap: break-word;
         }
-        .table, .table th, .table td {
-            border: 1px solid black;
+
+        td, th {
+            padding: 8px;
+            word-break: break-word;
         }
-        .table th, .table td {
-            padding: 10px;
-            text-align: center;
+
+        .info-table td {
+            vertical-align: top;
         }
-        .table th {
+
+        .products th {
             background-color: #333;
             color: white;
+            text-align: center;
         }
-        .total-table {
-            width: 100%;
-            margin-top: 20px;
+
+        .products td {
+            text-align: center;
+        }
+
+        .totals td {
             text-align: right;
         }
-        .total-table td {
-            padding: 8px;
-        }
-        .total-row {
+
+        .totals .label {
             font-weight: bold;
-            background-color: #f8f8f8;
+        }
+
+        .totals .total-row {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        hr {
+            margin: 30px 0;
         }
     </style>
 </head>
 <body>
-    <div class="invoice-container">
-        <!-- Invoice Header -->
+    <div class="container">
         <h2>Invoice #{{ bill.Billing_ID }}</h2>
 
-        <div class="row">
-            <!-- Company Info -->
-            <div class="column">
-                <h4>Company Information</h4>
-                <p><strong>{{ company.name }}</strong></p>
-                <p>{{ company.address }}</p>
-                <p>Email: {{ company.email }}</p>
-                <p>Phone: {{ company.phone }}</p>
-            </div>
+        <!-- Company and Client Info -->
+        <table class="info-table" style="margin-bottom: 20px;">
+            <tr>
+                <td style="width: 50%;">
+                    <h4>Company Information</h4>
+                    <p><strong>{{ company.name }}</strong></p>
+                    <p>{{ company.address }}</p>
+                    <p>Email: {{ company.email }}</p>
+                    <p>Phone: {{ company.phone }}</p>
+                </td>
+                <td style="width: 50%; text-align: right;">
+                    <h4>Client Information</h4>
+                    <p><strong>{{ client.first_name }} {{ client.last_name }}</strong></p>
+                    <p>{{ client.address }}</p>
+                    <p>{{ client.city }}, {{ client.province }} {{ client.postal_code }}</p>
+                    <p>{{ client.country }}</p>
+                    <p>Email: {{ client.email }}</p>
+                    <p>Phone: {{ client.phone_number }}</p>
+                </td>
+            </tr>
+        </table>
 
-            <!-- Client Info -->
-            <div class="column" style="text-align: right;">
-                <h4>Client Information</h4>
-                <p><strong>{{ client.first_name }} {{ client.last_name }}</strong></p>
-                <p>{{ client.address }}</p>
-                <p>{{ client.city }}, {{ client.province }} {{ client.postal_code }}</p>
-                <p>{{ client.country }}</p>
-                <p>Email: {{ client.email }}</p>
-                <p>Phone: {{ client.phone_number }}</p>
-            </div>
-        </div>
-
-        <!-- Invoice Date -->
         <hr>
+
         <p><strong>Date:</strong> {{ bill.Date.strftime('%Y-%m-%d') }}</p>
 
-        <!-- Products Purchased -->
-        <h4>Products Purchased</h4>
-        <table class="table">
+        <h4 style="margin-top: 30px;">Products Purchased</h4>
+        <table class="products" border="1">
             <thead>
                 <tr>
-                    <th>Product Name</th>
-                    <th>Unit Price</th>
-                    <th>Quantity</th>
-                    <th>Subtotal</th>
+                    <th style="width: 40%;">Product Name</th>
+                    <th style="width: 20%;">Unit Price</th>
+                    <th style="width: 20%;">Quantity</th>
+                    <th style="width: 20%;">Subtotal</th>
                 </tr>
             </thead>
             <tbody>
@@ -112,18 +126,18 @@
             </tbody>
         </table>
 
-        <!-- Total Calculation -->
-        <table class="total-table">
+        <!-- Totals -->
+        <table class="totals" style="margin-top: 30px;">
             <tr>
-                <td><strong>Total Before Tax:</strong></td>
+                <td class="label" style="width: 80%;">Total Before Tax:</td>
                 <td>${{ "%.2f"|format(bill.Total_BT) }}</td>
             </tr>
             <tr>
-                <td><strong>HST:</strong></td>
+                <td class="label">HST:</td>
                 <td>${{ "%.2f"|format(bill.Total_HST) }}</td>
             </tr>
             <tr class="total-row">
-                <td><strong>Total Amount:</strong></td>
+                <td class="label">Total Amount:</td>
                 <td><strong>${{ "%.2f"|format(bill.Total_Net) }}</strong></td>
             </tr>
         </table>
