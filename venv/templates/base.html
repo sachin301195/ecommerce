@@ -10,8 +10,6 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>Welcome to Cell Phone E-Commerce Store </title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -32,7 +30,7 @@
             font-family: 'Roboto', sans-serif;
             background-color: #f4f4f4;
             color: #333;
-        }
+ }
 
         .navbar {
             background-color: black;
@@ -63,8 +61,7 @@
             flex-grow: 1;
             text-transform: uppercase;
         }
-
-        .navbar-dark .navbar-nav .nav-link {
+.navbar-dark .navbar-nav .nav-link {
             color: white;
         }
 
@@ -92,30 +89,53 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="navbar-custom">
-            <a class="nav-item nav-link fw-bold" id="home" href="/">Home</a>
-            <a class="navbar-brand" href="/">Welcome to Cell Phone E-Commerce Store</a>
-            <div class="navbar-nav">
-                {% if user.is_authenticated %}
-                    {% if session.get('admin_authenticated') %}
-                        <a class="nav-item nav-link fw-bold" id="admin_logout" href="{{ url_for('cpanel.admin_logout') }}">Admin Logout</a>
-                    {% else %}
-                        <a class="nav-item nav-link fw-bold" id="home" href="/cart">Cart</a>
-                        <a class="nav-item nav-link fw-bold" id="Orders" href="/orders">Orders</a>
-                        <a class="nav-item nav-link fw-bold" id="profile" href="/profile">Profile</a>
-                        <a class="nav-item nav-link fw-bold" id="logout" href="/logout">Logout</a>
-                    {% endif %}
-                {% else %}
-                    <a class="nav-item nav-link fw-bold" id="login" href="/login">Login</a>
-                    <a class="nav-item nav-link fw-bold" id="signUp" href="/sign-up">Sign Up</a>
-                {% endif %}
-            </div>
-            
-        </div>
-    </nav>
 
-    <div class="content">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand text-warning fw-bold text-uppercase" href="/">Cell Phone Store</a>
+<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+      aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link fw-bold" href="/">Home</a>
+        </li>
+        {% if user.is_authenticated %}
+          {% if session.get('admin_authenticated') %}
+            <li class="nav-item">
+              <a class="nav-link fw-bold" href="{{ url_for('cpanel.admin_logout') }}">Admin Logout</a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link fw-bold" href="/cart">Cart</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-bold" href="/orders">Orders</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-bold" href="/profile">Profile</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link fw-bold" href="/logout">Logout</a>
+            </li>
+          {% endif %}
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link fw-bold" href="/login">Login</a>
+  </li>
+          <li class="nav-item">
+            <a class="nav-link fw-bold" href="/sign-up">Sign Up</a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="container content">
         {% block content %}{% endblock %}
     </div>
 
@@ -125,7 +145,6 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const hash = window.location.hash; // Get the hash fragment from the URL
